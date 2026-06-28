@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% block title %}{{ s.name }} — Strategic Memory CRM{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+    <a href="/">Dashboard</a> &rsaquo; {{ s.name }}
+</div>
+
+<div class="stakeholder-header">
+    <div>
+        <h1>{{ s.name }}</h1>
+        <p class="subtitle">{{ s.role }} &mdash; {{ s.organization }}</p>
+    </div>
+    <div class="header-badges">
+        <span class="badge badge-tier">{{ s.tier.value|replace('_', ' ') }}</span>
+    </div>
+</div>
+
+<div class="detail-grid">
+    <div class="detail-card">
+        <h3>Influence Metrics</h3>
+        <dl>
+            <dt>Power Score</dt><dd>{{ power_score }}</dd>
+            <dt>PageRank</dt><dd>{{ pagerank }}</dd>
+            <dt>Betweenness</dt><dd>{{ betweenness }}</dd>
+        </dl>
+    </div>
+
+    <div class="detail-card">
+        <h3>Risk Assessment</h3>
+        {% if risk %}
+        <div class="risk-score {% if risk.risk_score > 0.5 %}risk-high{% elif risk.risk_score > 0.3 %}risk-medium{% else %}risk-low{% endif %}">
+            {{ risk.risk_score }}
+        </div>
+        {% for f in risk.factors %}
+        <span class="flag">{{ f|replace('_', ' ') }}</span>
+        {% endfor %}
+        {% if risk.recommendations %}
+        <h4>Recommendations</h4>
+        <ul>{% for r in risk.recommendations %}<li>{{ r }}</li>{% endfor %}</ul>
+        {% endif %}
+        {% endif %}
+    </div>
+
+    <div class="detail-card">
+        <h3>Personality Profile</h3>
+        {% for axis, val in s.personality.items() %}
+        <div class="personality-bar">
+            <span class="axis-label">{{ axis|replace('_', ' ')|title }}</span>
+            <div class="bar-track">
+                <div class="bar-fill" style="width: {{ (val * 100)|int }}%"></div>
+            </div>
+            <span class="axis-value">{{ (val * 100)|int }}%</span>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="detail-card">
+        <h3>Negotiation Profile</h3>
+        {% if profile %}
+        <dl>
+            <dt>Style</dt><dd><span class="badge badge-neg-{{ profile.dominant_style }}">{{ profile.dominant_style }}</span></dd>
+            <dt>Reliability</dt><dd>{{ profile.reliability_score }}</dd>
+            <dt>Concession Ratio</dt><dd>{{ profile.concession_ratio }}</dd>
+            <dt>Power Moves</dt><dd>{{ profile.power_moves }}</dd>
+            <dt>Negotiations</dt><dd>{{ profile.total_negotiations }}</dd>
+        </dl>
+        {% if profile.patterns %}
+        <div class="mt-1">
+            {% for p in profile.patterns %}
+            <span class="flag flag-neg">{{ p|replace('_', ' ') }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% else %}
+        <p class="muted">No negotiation data</p>
+        {% endif %}
+    </div>
+</div>
+
+<section class="section">
+    <h2>Strategic Context</h2>
+    <div class="context-grid">
+        <div>
+            <h3>Goals</h3>
+            <ul>{% for g in s.goals %}<li>{{ g }}</li>{% endfor %}</ul>
+        </div>
+        <div>
+            <h3>Vulnerabilities</h3>
+            <ul>{% for v in s.vulnerabilities %}<li>{{ v }}</li>{% endfor %}</ul>
+        </div>
+        <div>
+            <h3>Political Vulnerabilities</h3>
+            {% if vulnerabilities %}
+            <ul>{% for v in vulnerabilities %}<li>{{ v|replace('_', ' ') }}</li>{% endfor %}</ul>
+            {% else %}<p class="muted">None detected</p>{% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Relationships</h2>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Stakeholder</th>
+                    <th>Trust</th>
+                    <th>Entropy</th>
+                    <th>Risk</th>
+                    <th>Interactions</th>
+                    <th>Trajectory</th>
+                    <th>Reciprocity</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in relationships %}
+                <tr>
+                    <td><a href="/stakeholder/{{ r.other_id }}">{{ r.other_name }}</a></td>
+                    <td>
+                        <div class="bar-cell">
+                            <div class="bar bar-trust" style="width: {{ (r.trust * 100)|int }}%"></div>
+                            <span>{{ r.trust }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="bar-cell">
+                            <div class="bar bar-entropy" style="width: {{ (r.entropy * 100)|int }}%"></div>
+                            <span>{{ r.entropy }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="bar-cell">
+                            <div class="bar bar-risk" style="width: {{ (r.risk * 100)|int }}%"></div>
+                            <span>{{ r.risk }}</span>
+                        </div>
+                    </td>
+                    <td>{{ r.interactions }}</td>
+                    <td><span class="badge badge-traj-{{ r.trajectory }}">{{ r.trajectory|replace('_', ' ') }}</span></td>
+                    <td>{{ r.reciprocity }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Recent Interactions</h2>
+    <div class="timeline">
+        {% for i in interactions %}
+        <div class="timeline-item sentiment-{{ i.sentiment }}">
+            <div class="timeline-date">{{ i.timestamp[:10] }}</div>
+            <div class="timeline-body">
+                <span class="badge badge-itype">{{ i.type|replace('_', ' ') }}</span>
+                <p>{{ i.summary }}</p>
+                {% if i.commitments_made %}
+                <div class="commitments">
+                    <strong>Commitments:</strong>
+                    {% for c in i.commitments_made %}
+                    <span class="commitment {% if i.commitments_kept %}kept{% elif i.commitments_kept == false %}broken{% endif %}">{{ c }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% if i.information_shared %}
+                <div class="info-shared">Shared: {{ i.information_shared|join(', ') }}</div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Strategic Memory CRM{% endblock %}
+
+{% block content %}
+<h1>Relationship Intelligence Dashboard</h1>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-value">{{ stakeholders|length }}</div>
+        <div class="stat-label">Stakeholders</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ n_interactions }}</div>
+        <div class="stat-label">Interactions Tracked</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ n_relationships }}</div>
+        <div class="stat-label">Active Relationships</div>
+    </div>
+    <div class="stat-card {% if net_entropy > 0.5 %}stat-warning{% elif net_entropy > 0.3 %}stat-caution{% else %}stat-ok{% endif %}">
+        <div class="stat-value">{{ net_entropy }}</div>
+        <div class="stat-label">Network Entropy</div>
+    </div>
+</div>
+
+<section class="section">
+    <h2>Network Intelligence</h2>
+    <div class="intel-grid">
+        <div class="intel-card">
+            <h3>Gatekeepers</h3>
+            <p class="intel-desc">High betweenness centrality — control information flow</p>
+            {% if gatekeepers %}
+            <ul>{% for g in gatekeepers %}<li>{{ g }}</li>{% endfor %}</ul>
+            {% else %}<p class="muted">None detected</p>{% endif %}
+        </div>
+        <div class="intel-card">
+            <h3>Brokers</h3>
+            <p class="intel-desc">Bridge otherwise disconnected groups</p>
+            {% if brokers %}
+            <ul>{% for b in brokers %}<li>{{ b }}</li>{% endfor %}</ul>
+            {% else %}<p class="muted">None detected</p>{% endif %}
+        </div>
+        <div class="intel-card">
+            <h3>Coalitions</h3>
+            <p class="intel-desc">Clusters of closely-connected stakeholders</p>
+            {% for c in coalitions %}
+            <div class="coalition-tag">{{ c|length }} members</div>
+            {% endfor %}
+        </div>
+        <div class="intel-card">
+            <h3>Negotiation Dynamics</h3>
+            <p class="intel-desc">Detected reciprocal patterns</p>
+            {% for p in reciprocal_pairs %}
+            <div class="dynamic-pair">
+                <span>{{ p.a }} &harr; {{ p.b }}</span>
+                <span class="badge badge-{{ p.dynamic }}">{{ p.dynamic|replace('_', ' ') }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Stakeholder Risk Matrix</h2>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Organization</th>
+                    <th>Tier</th>
+                    <th>Avg Trust</th>
+                    <th>Power</th>
+                    <th>Risk</th>
+                    <th>Neg. Style</th>
+                    <th>Flags</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in stakeholders %}
+                <tr>
+                    <td><a href="/stakeholder/{{ s.id }}">{{ s.name }}</a></td>
+                    <td>{{ s.role }}</td>
+                    <td><span class="org-badge org-{{ s.organization|lower|replace(' ', '-')|truncate(20, False, '') }}">{{ s.organization }}</span></td>
+                    <td>{{ s.tier|replace('_', ' ') }}</td>
+                    <td>
+                        <div class="bar-cell">
+                            <div class="bar bar-trust" style="width: {{ (s.avg_trust * 100)|int }}%"></div>
+                            <span>{{ s.avg_trust }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="bar-cell">
+                            <div class="bar bar-power" style="width: {{ (s.power_score * 100)|int }}%"></div>
+                            <span>{{ s.power_score }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="bar-cell">
+                            <div class="bar bar-risk" style="width: {{ (s.risk_score * 100)|int }}%"></div>
+                            <span>{{ s.risk_score }}</span>
+                        </div>
+                    </td>
+                    <td><span class="badge badge-neg-{{ s.neg_style }}">{{ s.neg_style }}</span></td>
+                    <td>
+                        {% for v in s.vulnerabilities %}
+                        <span class="flag">{{ v|replace('_', ' ') }}</span>
+                        {% endfor %}
+                        {% for p in s.neg_patterns %}
+                        <span class="flag flag-neg">{{ p|replace('_', ' ') }}</span>
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

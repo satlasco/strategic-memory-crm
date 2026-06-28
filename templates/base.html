@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Strategic Memory CRM{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="nav-brand">Strategic Memory CRM</a>
+        <div class="nav-links">
+            <a href="/">Dashboard</a>
+            <a href="/graph">Stakeholder Graph</a>
+            <a href="/api/state" target="_blank">API</a>
+        </div>
+    </nav>
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="footer">
+        <p>Strategic Memory CRM &mdash; Relationship Intelligence Prototype</p>
+    </footer>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

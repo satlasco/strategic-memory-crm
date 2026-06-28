@@ -1,0 +1,363 @@
+{% extends "base.html" %}
+{% block title %}Stakeholder Graph — Strategic Memory CRM{% endblock %}
+
+{% block head %}
+<style>
+    #graph-container {
+        width: 100%;
+        height: 70vh;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--bg-card);
+        position: relative;
+    }
+    .graph-legend {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        margin: 1rem 0;
+    }
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.85rem;
+    }
+    .legend-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+    .legend-line {
+        width: 24px;
+        height: 3px;
+        border-radius: 2px;
+    }
+    .graph-controls {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    .graph-controls button {
+        padding: 0.4rem 0.8rem;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        background: var(--bg-card);
+        cursor: pointer;
+        font-size: 0.85rem;
+    }
+    .graph-controls button:hover {
+        background: var(--accent);
+        color: white;
+    }
+    .tooltip {
+        position: absolute;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        padding: 0.75rem;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        pointer-events: none;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        max-width: 280px;
+        z-index: 10;
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>Stakeholder Network Graph</h1>
+<p class="subtitle">Node size = influence (PageRank). Edge color = trust level. Edge width = interaction frequency.</p>
+
+<div class="graph-legend">
+    <div class="legend-item"><div class="legend-dot" style="background: #4e79a7"></div> Meridian Systems</div>
+    <div class="legend-item"><div class="legend-dot" style="background: #f28e2b"></div> Vantage Analytics</div>
+    <div class="legend-item"><div class="legend-dot" style="background: #e15759"></div> External</div>
+    <div class="legend-item"><div class="legend-line" style="background: #2ca02c"></div> High Trust (&ge;0.7)</div>
+    <div class="legend-item"><div class="legend-line" style="background: #ff7f0e"></div> Medium Trust</div>
+    <div class="legend-item"><div class="legend-line" style="background: #d62728"></div> Low Trust (&lt;0.4)</div>
+</div>
+
+<div class="graph-controls">
+    <button onclick="resetZoom()">Reset View</button>
+    <button onclick="toggleLabels()">Toggle Labels</button>
+</div>
+
+<div id="graph-container">
+    <canvas id="graph-canvas"></canvas>
+    <div class="tooltip" id="tooltip"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const canvas = document.getElementById('graph-canvas');
+const ctx = canvas.getContext('2d');
+const container = document.getElementById('graph-container');
+const tooltip = document.getElementById('tooltip');
+let showLabels = true;
+let graphData = null;
+let nodes = [];
+let edges = [];
+let transform = { x: 0, y: 0, scale: 1 };
+let dragging = null;
+let panning = false;
+let panStart = { x: 0, y: 0 };
+let simRunning = true;
+
+function resize() {
+    canvas.width = container.clientWidth;
+    canvas.height = container.clientHeight;
+}
+
+async function loadGraph() {
+    const res = await fetch('/api/graph');
+    graphData = await res.json();
+    initSimulation();
+}
+
+function initSimulation() {
+    const w = canvas.width;
+    const h = canvas.height;
+    const cx = w / 2;
+    const cy = h / 2;
+
+    nodes = graphData.nodes.map((n, i) => ({
+        ...n,
+        x: cx + (Math.cos(i * 2 * Math.PI / graphData.nodes.length) * 200) + (Math.random() - 0.5) * 50,
+        y: cy + (Math.sin(i * 2 * Math.PI / graphData.nodes.length) * 200) + (Math.random() - 0.5) * 50,
+        vx: 0,
+        vy: 0,
+        radius: Math.max(8, n.size),
+    }));
+
+    edges = graphData.edges.map(e => ({
+        ...e,
+        sourceNode: nodes.find(n => n.id === e.source),
+        targetNode: nodes.find(n => n.id === e.target),
+    }));
+
+    requestAnimationFrame(simulate);
+}
+
+function simulate() {
+    if (!simRunning) { draw(); return; }
+
+    const alpha = 0.3;
+    const repulsion = 3000;
+    const attraction = 0.005;
+    const centerForce = 0.01;
+    const damping = 0.85;
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+
+    // Repulsion between nodes
+    for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+            let dx = nodes[j].x - nodes[i].x;
+            let dy = nodes[j].y - nodes[i].y;
+            let dist = Math.sqrt(dx * dx + dy * dy) || 1;
+            let force = repulsion / (dist * dist);
+            let fx = (dx / dist) * force;
+            let fy = (dy / dist) * force;
+            nodes[i].vx -= fx;
+            nodes[i].vy -= fy;
+            nodes[j].vx += fx;
+            nodes[j].vy += fy;
+        }
+    }
+
+    // Attraction along edges
+    for (const e of edges) {
+        if (!e.sourceNode || !e.targetNode) continue;
+        let dx = e.targetNode.x - e.sourceNode.x;
+        let dy = e.targetNode.y - e.sourceNode.y;
+        let dist = Math.sqrt(dx * dx + dy * dy) || 1;
+        let force = dist * attraction;
+        let fx = (dx / dist) * force;
+        let fy = (dy / dist) * force;
+        e.sourceNode.vx += fx;
+        e.sourceNode.vy += fy;
+        e.targetNode.vx -= fx;
+        e.targetNode.vy -= fy;
+    }
+
+    // Center gravity
+    for (const n of nodes) {
+        n.vx += (cx - n.x) * centerForce;
+        n.vy += (cy - n.y) * centerForce;
+    }
+
+    // Update positions
+    let totalMovement = 0;
+    for (const n of nodes) {
+        if (n === dragging) continue;
+        n.vx *= damping;
+        n.vy *= damping;
+        n.x += n.vx * alpha;
+        n.y += n.vy * alpha;
+        totalMovement += Math.abs(n.vx) + Math.abs(n.vy);
+    }
+
+    draw();
+
+    if (totalMovement > 0.5) {
+        requestAnimationFrame(simulate);
+    } else {
+        simRunning = false;
+        draw();
+    }
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.translate(transform.x, transform.y);
+    ctx.scale(transform.scale, transform.scale);
+
+    // Draw edges
+    for (const e of edges) {
+        if (!e.sourceNode || !e.targetNode) continue;
+        ctx.beginPath();
+        ctx.moveTo(e.sourceNode.x, e.sourceNode.y);
+        ctx.lineTo(e.targetNode.x, e.targetNode.y);
+        ctx.strokeStyle = e.color;
+        ctx.lineWidth = Math.max(1, e.width * 0.6) / transform.scale;
+        if (e.style === 'dashed') {
+            ctx.setLineDash([4 / transform.scale, 4 / transform.scale]);
+        } else {
+            ctx.setLineDash([]);
+        }
+        ctx.globalAlpha = 0.6;
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+        ctx.setLineDash([]);
+    }
+
+    // Draw nodes
+    for (const n of nodes) {
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.radius / transform.scale, 0, Math.PI * 2);
+        ctx.fillStyle = n.color;
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2 / transform.scale;
+        ctx.stroke();
+
+        if (showLabels) {
+            ctx.fillStyle = '#e0e0e0';
+            ctx.font = `${11 / transform.scale}px -apple-system, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.fillText(n.label, n.x, n.y + n.radius / transform.scale + 14 / transform.scale);
+        }
+    }
+
+    ctx.restore();
+}
+
+function getNodeAt(mx, my) {
+    const x = (mx - transform.x) / transform.scale;
+    const y = (my - transform.y) / transform.scale;
+    for (const n of nodes) {
+        const dx = x - n.x;
+        const dy = y - n.y;
+        if (dx * dx + dy * dy < (n.radius / transform.scale + 5) ** 2) return n;
+    }
+    return null;
+}
+
+canvas.addEventListener('mousedown', e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    const node = getNodeAt(mx, my);
+    if (node) {
+        dragging = node;
+    } else {
+        panning = true;
+        panStart = { x: e.clientX - transform.x, y: e.clientY - transform.y };
+    }
+});
+
+canvas.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+
+    if (dragging) {
+        dragging.x = (mx - transform.x) / transform.scale;
+        dragging.y = (my - transform.y) / transform.scale;
+        dragging.vx = 0;
+        dragging.vy = 0;
+        draw();
+    } else if (panning) {
+        transform.x = e.clientX - panStart.x;
+        transform.y = e.clientY - panStart.y;
+        draw();
+    } else {
+        const node = getNodeAt(mx, my);
+        if (node) {
+            tooltip.style.display = 'block';
+            tooltip.style.left = (mx + 15) + 'px';
+            tooltip.style.top = (my - 10) + 'px';
+            tooltip.innerHTML = `
+                <strong>${node.label}</strong><br>
+                ${node.role}<br>
+                <small>${node.organization}</small><br>
+                <hr style="margin: 4px 0; border-color: var(--border)">
+                Tier: ${node.tier.replace('_', ' ')}<br>
+                Influence: ${node.power}
+            `;
+        } else {
+            tooltip.style.display = 'none';
+        }
+    }
+});
+
+canvas.addEventListener('mouseup', () => {
+    if (dragging) {
+        simRunning = true;
+        requestAnimationFrame(simulate);
+    }
+    dragging = null;
+    panning = false;
+});
+
+canvas.addEventListener('wheel', e => {
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    const zoom = e.deltaY < 0 ? 1.1 : 0.9;
+    transform.x = mx - (mx - transform.x) * zoom;
+    transform.y = my - (my - transform.y) * zoom;
+    transform.scale *= zoom;
+    draw();
+});
+
+canvas.addEventListener('dblclick', e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    const node = getNodeAt(mx, my);
+    if (node) {
+        window.location.href = '/stakeholder/' + node.id;
+    }
+});
+
+function resetZoom() {
+    transform = { x: 0, y: 0, scale: 1 };
+    draw();
+}
+
+function toggleLabels() {
+    showLabels = !showLabels;
+    draw();
+}
+
+window.addEventListener('resize', () => { resize(); draw(); });
+resize();
+loadGraph();
+</script>
+{% endblock %}
