@@ -1,0 +1,7 @@
+{
+  "include": [
+    "app.py",
+    "strategic_memory_crm",
+    "tests"
+  ]
+}
