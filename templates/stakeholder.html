@@ -78,6 +78,49 @@
     </div>
 </div>
 
+<!-- ============ AI STRATEGIC ADVISOR SECTION ============ -->
+<section class="section advisor-section">
+    <div class="advisor-header">
+        <div>
+            <h2>⚡ AI Strategic Advisor & Tactical Briefing</h2>
+            <p class="subtitle">Generate high-stakes negotiation battleplans, leverage points, and red-line warnings</p>
+        </div>
+    </div>
+    
+    <div class="advisor-controls-card">
+        <div class="advisor-config-row">
+            <div class="form-group" style="flex: 1;">
+                <label>AI Intelligence Engine:</label>
+                <select id="advisor-provider" onchange="toggleAdvisorKeyField()">
+                    <option value="builtin" selected>🟢 Built-in Tactical Engine (Offline / Instant)</option>
+                    <option value="gemini">✨ Google Gemini (2.0 Flash / Pro)</option>
+                    <option value="openai">🧠 OpenAI (GPT-4o / Mini)</option>
+                    <option value="anthropic">⚡ Anthropic Claude (3.5 Sonnet)</option>
+                </select>
+            </div>
+            <div class="form-group" id="advisor-key-container" style="flex: 2; display: none;">
+                <label>API Key (Saved locally):</label>
+                <input type="password" id="advisor-api-key" placeholder="Enter API key...">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Specific Meeting Context or Objective:</label>
+            <input type="text" id="advisor-context" placeholder="e.g. Discussing European expansion budget cuts and head-count allocation..." value="Strategic alignment on upcoming quarterly milestone commitments">
+        </div>
+        <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+            <button class="btn btn-primary" id="btn-generate-briefing" onclick="generateTacticalBriefing()">⚡ Generate Tactical Briefing</button>
+        </div>
+    </div>
+
+    <div id="briefing-output-container" class="briefing-output-card" style="display: none;">
+        <div class="briefing-toolbar">
+            <span id="briefing-status" class="briefing-status">✔ Briefing Generated</span>
+            <button class="btn btn-secondary btn-sm" onclick="copyBriefing()">📋 Copy Briefing</button>
+        </div>
+        <div id="briefing-content" class="briefing-markdown"></div>
+    </div>
+</section>
+
 <section class="section">
     <h2>Strategic Context</h2>
     <div class="context-grid">
@@ -116,7 +159,7 @@
             <tbody>
                 {% for r in relationships %}
                 <tr>
-                    <td><a href="/stakeholder/{{ r.other_id }}">{{ r.other_name }}</a></td>
+                    <td><a href="/stakeholder/{{ r.other_id }}"><strong>{{ r.other_name }}</strong></a></td>
                     <td>
                         <div class="bar-cell">
                             <div class="bar bar-trust" style="width: {{ (r.trust * 100)|int }}%"></div>
@@ -158,16 +201,100 @@
                 <div class="commitments">
                     <strong>Commitments:</strong>
                     {% for c in i.commitments_made %}
-                    <span class="commitment {% if i.commitments_kept %}kept{% elif i.commitments_kept == false %}broken{% endif %}">{{ c }}</span>
+                    <span class="commitment-tag">{{ c }}</span>
                     {% endfor %}
                 </div>
-                {% endif %}
-                {% if i.information_shared %}
-                <div class="info-shared">Shared: {{ i.information_shared|join(', ') }}</div>
                 {% endif %}
             </div>
         </div>
         {% endfor %}
     </div>
 </section>
+
+<script>
+function toggleAdvisorKeyField() {
+    const provider = document.getElementById('advisor-provider').value;
+    const keyCont = document.getElementById('advisor-key-container');
+    const keyInput = document.getElementById('advisor-api-key');
+    if (provider === 'builtin') {
+        keyCont.style.display = 'none';
+    } else {
+        keyCont.style.display = 'block';
+        keyInput.value = localStorage.getItem('crm_advisor_key_' + provider) || '';
+    }
+}
+
+function parseMarkdownToHTML(md) {
+    if (!md) return '';
+    return md
+        .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+        .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+        .replace(/^\* (.*$)/gim, '<li>$1</li>')
+        .replace(/^- (.*$)/gim, '<li>$1</li>')
+        .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+        .replace(/`([^`]+)`/gim, '<code>$1</code>')
+        .replace(/\n\n/gim, '<br><br>');
+}
+
+function generateTacticalBriefing() {
+    const provider = document.getElementById('advisor-provider').value;
+    const apiKey = document.getElementById('advisor-api-key').value.trim();
+    const context = document.getElementById('advisor-context').value.trim();
+    const btn = document.getElementById('btn-generate-briefing');
+    const outCont = document.getElementById('briefing-output-container');
+    const outDiv = document.getElementById('briefing-content');
+    const statusEl = document.getElementById('briefing-status');
+
+    if (provider !== 'builtin') {
+        localStorage.setItem('crm_advisor_key_' + provider, apiKey);
+    }
+
+    btn.disabled = true;
+    btn.textContent = '⚡ Analyzing & Generating Battleplan...';
+    outCont.style.display = 'block';
+    outDiv.innerHTML = '<p class="muted">Synthesizing behavioral metrics, psychometrics, and political network graph...</p>';
+
+    fetch('/api/advisor/briefing', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            stakeholder_id: '{{ s.id }}',
+            context: context,
+            provider: provider,
+            apiKey: apiKey
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.error) {
+            outDiv.innerHTML = `<p style="color: #ef4444;"><strong>Error:</strong> ${data.error}</p>`;
+            statusEl.textContent = '❌ Generation Failed';
+        } else {
+            outDiv.innerHTML = parseMarkdownToHTML(data.output);
+            statusEl.textContent = `✔ Briefing Generated (${data.provider.toUpperCase()})`;
+        }
+    })
+    .catch(err => {
+        outDiv.innerHTML = `<p style="color: #ef4444;"><strong>Network Error:</strong> ${err.message}</p>`;
+        statusEl.textContent = '❌ Error';
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.textContent = '⚡ Generate Tactical Briefing';
+    });
+}
+
+function copyBriefing() {
+    const text = document.getElementById('briefing-content').innerText;
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Tactical briefing copied to clipboard!');
+    });
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    toggleAdvisorKeyField();
+});
+</script>
 {% endblock %}

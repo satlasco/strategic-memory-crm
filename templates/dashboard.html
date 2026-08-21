@@ -2,7 +2,17 @@
 {% block title %}Dashboard — Strategic Memory CRM{% endblock %}
 
 {% block content %}
-<h1>Relationship Intelligence Dashboard</h1>
+<div class="dashboard-header-row">
+    <div>
+        <h1>Relationship Intelligence Dashboard</h1>
+        <p class="subtitle">Behavioral profiling, trust trajectories, and organizational politics engine</p>
+    </div>
+    <div class="header-actions">
+        <button class="btn btn-primary" onclick="openModal('interaction-modal')">➕ Log Interaction</button>
+        <button class="btn btn-secondary" onclick="openModal('stakeholder-modal')">👤 Add Stakeholder</button>
+        <button class="btn btn-danger" onclick="resetBaseline()">🔄 Reset Data</button>
+    </div>
+</div>
 
 <div class="stats-grid">
     <div class="stat-card">
@@ -80,7 +90,7 @@
             <tbody>
                 {% for s in stakeholders %}
                 <tr>
-                    <td><a href="/stakeholder/{{ s.id }}">{{ s.name }}</a></td>
+                    <td><a href="/stakeholder/{{ s.id }}"><strong>{{ s.name }}</strong></a></td>
                     <td>{{ s.role }}</td>
                     <td><span class="org-badge org-{{ s.organization|lower|replace(' ', '-')|truncate(20, False, '') }}">{{ s.organization }}</span></td>
                     <td>{{ s.tier|replace('_', ' ') }}</td>
@@ -117,4 +127,221 @@
         </table>
     </div>
 </section>
+
+<!-- ============ LOG INTERACTION MODAL ============ -->
+<div id="interaction-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>➕ Record Stakeholder Interaction</h3>
+            <button class="modal-close" onclick="closeModal('interaction-modal')">&times;</button>
+        </div>
+        <form id="interaction-form" onsubmit="submitInteraction(event)">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Source Stakeholder (Initiator):</label>
+                    <select id="int-source" required>
+                        <option value="">Select source...</option>
+                        {% for s in stakeholders %}
+                        <option value="{{ s.id }}">{{ s.name }} ({{ s.organization }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Target Stakeholder:</label>
+                    <select id="int-target" required>
+                        <option value="">Select target...</option>
+                        {% for s in stakeholders %}
+                        <option value="{{ s.id }}">{{ s.name }} ({{ s.organization }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Interaction Type:</label>
+                    <select id="int-type">
+                        <option value="meeting">Meeting</option>
+                        <option value="negotiation">Negotiation</option>
+                        <option value="email">Email</option>
+                        <option value="phone_call">Phone Call</option>
+                        <option value="collaboration">Collaboration</option>
+                        <option value="favor">Favor (+Trust Boost)</option>
+                        <option value="conflict">Conflict</option>
+                        <option value="betrayal">Betrayal (-Trust Penalty)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Observed Sentiment:</label>
+                    <select id="int-sentiment">
+                        <option value="2">Very Positive (+2)</option>
+                        <option value="1">Positive (+1)</option>
+                        <option value="0" selected>Neutral (0)</option>
+                        <option value="-1">Negative (-1)</option>
+                        <option value="-2">Very Negative (-2)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Summary / Meeting Notes:</label>
+                <textarea id="int-summary" rows="3" placeholder="Key outcomes, agreements, or dynamics observed..." required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Commitments Made (comma-separated):</label>
+                <input type="text" id="int-commitments" placeholder="e.g. Send updated pricing deck, Schedule board review">
+            </div>
+            <div class="form-row" style="margin-top: 10px;">
+                <label><input type="checkbox" id="int-power-move"> Power Move Attempted</label>
+                <label><input type="checkbox" id="int-concession"> Concession Made</label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('interaction-modal')">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="btn-save-interaction">Save & Calculate Dynamics</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ============ ADD STAKEHOLDER MODAL ============ -->
+<div id="stakeholder-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>👤 Add New Stakeholder</h3>
+            <button class="modal-close" onclick="closeModal('stakeholder-modal')">&times;</button>
+        </div>
+        <form id="stakeholder-form" onsubmit="submitStakeholder(event)">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Full Name:</label>
+                    <input type="text" id="stk-name" placeholder="e.g. Alex Morgan" required>
+                </div>
+                <div class="form-group">
+                    <label>Role / Title:</label>
+                    <input type="text" id="stk-role" placeholder="e.g. Chief Revenue Officer" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Organization:</label>
+                    <input type="text" id="stk-org" placeholder="e.g. Meridian Systems" required>
+                </div>
+                <div class="form-group">
+                    <label>Organizational Tier:</label>
+                    <select id="stk-tier">
+                        <option value="c_suite">C-Suite</option>
+                        <option value="vp">VP</option>
+                        <option value="director">Director</option>
+                        <option value="manager">Manager</option>
+                        <option value="individual">Individual Contributor</option>
+                        <option value="external">External Advisor / Board</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Core Goals (comma-separated):</label>
+                <input type="text" id="stk-goals" placeholder="e.g. Expand European market, Secure series B funding">
+            </div>
+            <div class="form-group">
+                <label>Vulnerabilities & Sensitivities (comma-separated):</label>
+                <input type="text" id="stk-vulns" placeholder="e.g. Dislikes sudden timeline shifts, Resource constrained">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('stakeholder-modal')">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="btn-save-stakeholder">Create Stakeholder</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openModal(id) {
+    document.getElementById(id).style.display = 'flex';
+}
+function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+}
+
+function submitInteraction(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btn-save-interaction');
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+
+    const payload = {
+        source_id: document.getElementById('int-source').value,
+        target_id: document.getElementById('int-target').value,
+        type: document.getElementById('int-type').value,
+        sentiment: parseInt(document.getElementById('int-sentiment').value),
+        summary: document.getElementById('int-summary').value.trim(),
+        commitments_made: document.getElementById('int-commitments').value ? document.getElementById('int-commitments').value.split(',').map(s=>s.trim()).filter(Boolean) : [],
+        power_move: document.getElementById('int-power-move').checked,
+        concession_made: document.getElementById('int-concession').checked
+    };
+
+    fetch('/api/interaction', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.error) {
+            alert('Error: ' + data.error);
+            btn.disabled = false;
+            btn.textContent = 'Save & Calculate Dynamics';
+        } else {
+            window.location.reload();
+        }
+    })
+    .catch(err => {
+        alert('Network Error: ' + err.message);
+        btn.disabled = false;
+        btn.textContent = 'Save & Calculate Dynamics';
+    });
+}
+
+function submitStakeholder(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btn-save-stakeholder');
+    btn.disabled = true;
+    btn.textContent = 'Creating...';
+
+    const payload = {
+        name: document.getElementById('stk-name').value.trim(),
+        role: document.getElementById('stk-role').value.trim(),
+        organization: document.getElementById('stk-org').value.trim(),
+        tier: document.getElementById('stk-tier').value,
+        goals: document.getElementById('stk-goals').value ? document.getElementById('stk-goals').value.split(',').map(s=>s.trim()).filter(Boolean) : [],
+        vulnerabilities: document.getElementById('stk-vulns').value ? document.getElementById('stk-vulns').value.split(',').map(s=>s.trim()).filter(Boolean) : []
+    };
+
+    fetch('/api/stakeholder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.error) {
+            alert('Error: ' + data.error);
+            btn.disabled = false;
+            btn.textContent = 'Create Stakeholder';
+        } else {
+            window.location.reload();
+        }
+    })
+    .catch(err => {
+        alert('Network Error: ' + err.message);
+        btn.disabled = false;
+        btn.textContent = 'Create Stakeholder';
+    });
+}
+
+function resetBaseline() {
+    if (confirm('Are you sure you want to reset all data back to the default baseline scenario?')) {
+        fetch('/api/reset', { method: 'POST' })
+            .then(r => r.json())
+            .then(() => window.location.reload());
+    }
+}
+</script>
 {% endblock %}

@@ -47,4 +47,5 @@ ENV/
 *.swo
 *~
 .DS_Store
+data/*.json
 data/generated/*.json

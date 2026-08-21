@@ -495,3 +495,226 @@ h1 {
     .navbar { padding: 0.6rem 1rem; }
     .nav-links { gap: 0.8rem; }
 }
+
+/* Additional Interactive UI Components (Modals, Forms, Buttons, AI Advisor) */
+
+.dashboard-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.header-actions {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.55rem 1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    font-family: inherit;
+}
+.btn-primary {
+    background: #3b82f6;
+    color: #ffffff;
+}
+.btn-primary:hover {
+    background: #2563eb;
+}
+.btn-secondary {
+    background: #1e293b;
+    color: #cbd5e1;
+    border-color: #334155;
+}
+.btn-secondary:hover {
+    background: #334155;
+    color: #ffffff;
+}
+.btn-danger {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border-color: rgba(239, 68, 68, 0.3);
+}
+.btn-danger:hover {
+    background: #ef4444;
+    color: #ffffff;
+}
+.btn-sm {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+}
+
+/* Modal */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+}
+
+.modal-card {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 580px;
+    padding: 1.5rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #1e293b;
+    padding-bottom: 0.8rem;
+    margin-bottom: 1.2rem;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    color: #f8fafc;
+}
+
+.modal-close {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    font-size: 1.5rem;
+    cursor: pointer;
+    line-height: 1;
+}
+.modal-close:hover { color: #ffffff; }
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    margin-top: 1.2rem;
+    border-top: 1px solid #1e293b;
+    padding-top: 1rem;
+}
+
+/* Forms */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-bottom: 0.9rem;
+}
+
+.form-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.4rem;
+}
+.form-row .form-group { flex: 1; }
+
+label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #94a3b8;
+}
+
+input[type="text"],
+input[type="password"],
+select,
+textarea {
+    width: 100%;
+    background: #090d16;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    padding: 0.55rem 0.75rem;
+    color: #f8fafc;
+    font-size: 0.88rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+select:focus,
+textarea:focus {
+    border-color: #3b82f6;
+}
+
+/* AI Strategic Advisor Card */
+.advisor-section {
+    background: linear-gradient(180deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.6) 100%);
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.advisor-controls-card {
+    background: #090d16;
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    padding: 1.2rem;
+    margin-top: 1rem;
+}
+
+.advisor-config-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.briefing-output-card {
+    background: #060911;
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    padding: 1.4rem;
+    margin-top: 1.2rem;
+}
+
+.briefing-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #1e293b;
+    padding-bottom: 0.6rem;
+    margin-bottom: 1rem;
+}
+
+.briefing-status {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #38bdf8;
+}
+
+.briefing-markdown {
+    color: #e2e8f0;
+    font-size: 0.92rem;
+    line-height: 1.6;
+}
+
+.briefing-markdown h1 { font-size: 1.3rem; color: #60a5fa; margin-top: 0; }
+.briefing-markdown h2 { font-size: 1.15rem; color: #93c5fd; margin-top: 1.2rem; border-bottom: 1px solid #1e293b; padding-bottom: 0.3rem; }
+.briefing-markdown h3 { font-size: 1.05rem; color: #bfdbfe; margin-top: 1rem; }
+.briefing-markdown strong { color: #f8fafc; }
+.briefing-markdown code { background: #1e293b; color: #38bdf8; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85em; }
+.briefing-markdown li { margin-bottom: 0.35rem; }
