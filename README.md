@@ -1,12 +1,49 @@
-# Strategic Memory CRM
+# 🧠 Strategic Memory CRM
 
-🇹🇷 [Türkçe Dokümantasyon](README.tr.md)
+<div align="center">
 
-> Relationship intelligence over transaction storage.
+[![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![Flask](https://img.shields.io/badge/Flask-3.0+-000000?style=for-the-badge&logo=flask&logoColor=white)](https://palletsprojects.com/p/flask/)
+[![NetworkX](https://img.shields.io/badge/NetworkX-3.2+-blue?style=for-the-badge&logo=python)](https://networkx.org/)
+[![License](https://img.shields.io/badge/License-Apache_2.0-10b981?style=for-the-badge)](LICENSE)
+[![Tests](https://img.shields.io/badge/Tests-18%20Passed-success?style=for-the-badge&logo=pytest&logoColor=white)](tests/test_crm.py)
+[![GitHub Stars](https://img.shields.io/github/stars/adacreativeco/strategic-memory-crm?style=for-the-badge&color=ffd700)](https://github.com/adacreativeco/strategic-memory-crm/stargazers)
+[![Release](https://img.shields.io/badge/Release-v1.0.0-6366f1?style=for-the-badge)](https://github.com/adacreativeco/strategic-memory-crm/releases)
+
+<br/>
+
+**Relationship intelligence over transaction storage.**
+
+[English Documentation](README.md) • [🇹🇷 Türkçe Dokümantasyon](README.tr.md)
+
+</div>
+
+---
 
 A lightweight, behavioral intelligence CRM platform that models **trust dynamics, negotiation patterns, influence structures, organizational politics, and relationship risk** — instead of just storing deals and sales pipelines.
 
-Built for strategists, executives, and leaders navigating complex stakeholder ecosystems where *who trusts whom* matters more than *who bought what*.
+Built for strategists, executives, and leaders navigating complex stakeholder ecosystems where ***who trusts whom* matters more than *who bought what***.
+
+---
+
+## 📸 Visual Showcase
+
+<div align="center">
+
+### 📊 Behavioral Intelligence & Relationship Matrix Dashboard
+![Strategic CRM Dashboard](dashboard_screenshot.png)
+
+<br/>
+
+### 🕸️ Interactive Stakeholder Network Graph & Power Structures
+![Stakeholder Network Graph](graph_screenshot.png)
+
+<br/>
+
+### 🎯 Deep Stakeholder Profile & AI Strategic Advisor Battleplan
+![Stakeholder Profile and AI Strategic Advisor](stakeholder_screenshot.png)
+
+</div>
 
 ---
 
@@ -14,7 +51,7 @@ Built for strategists, executives, and leaders navigating complex stakeholder ec
 
 ### 1. 🧠 Behavioral Intelligence Engine
 - **Trust Dynamics (`trust.py`):** Asymmetric trust scoring, continuous time-based passive decay, reciprocity balance, and personality compatibility.
-- **Negotiation Profiling (`negotiation.py`):** Dominator, accommodator, collaborator, competitor, avoider styles; serial promise-breakers and chronic yielders detection.
+- **Negotiation Profiling (`negotiation.py`):** Dominator, accommodator, collaborator, competitor, avoider styles; detects serial promise-breakers and chronic yielders.
 - **Influence & Organizational Politics (`influence.py`):** NetworkX-powered PageRank, betweenness centrality, hidden coalition detection, gatekeepers, and brokers (articulation points).
 - **Relationship Entropy (`entropy.py`):** Information-theoretic unpredictability measurement via Shannon entropy, trust delta volatility, and interaction regularity.
 - **Composite Risk Assessment (`risk.py`):** Relationship and stakeholder risk scores with actionable factors and tactical recommendations.
@@ -40,7 +77,7 @@ Built for strategists, executives, and leaders navigating complex stakeholder ec
 
 ## 🛠️ Quick Start
 
-### 1. Install Dependencies
+### 1. Clone & Install Dependencies
 ```bash
 git clone https://github.com/adacreativeco/strategic-memory-crm.git
 cd strategic-memory-crm
@@ -86,7 +123,7 @@ strategic-memory-crm/
 ├── tests/
 │   └── test_crm.py                 # Comprehensive unit test suite (18 tests)
 ├── data/                           # Persistent state directory (crm_state.json)
-└── requirements.txt                # Dependencies (Flask, NetworkX, NumPy)
+└── requirements.txt                # Dependencies (Flask, NetworkX, NumPy, SciPy)
 ```
 
 ---
@@ -94,3 +131,9 @@ strategic-memory-crm/
 ## 📄 License
 
 Distributed under the Apache 2.0 License. See [LICENSE](LICENSE) for details.
+
+---
+
+<div align="center">
+Built with 🧠 by <a href="https://github.com/adacreativeco">ADA Creative Co.</a>
+</div>
