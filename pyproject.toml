@@ -1,7 +1,7 @@
 [project]
 name = "strategic-memory-crm"
-version = "1.0.0"
-description = "Behavioral intelligence CRM platform modeling trust dynamics, negotiation patterns, influence structures, and relationship risk."
+version = "1.1.0"
+description = "Behavioral intelligence CRM platform and MCP server modeling trust dynamics, negotiation patterns, influence structures, and relationship risk."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "Apache-2.0" }
@@ -9,6 +9,9 @@ authors = [
     { name = "ADA Creative Co.", email = "hello@adacreative.co" }
 ]
 keywords = [
+    "mcp",
+    "model-context-protocol",
+    "mcp-server",
     "crm",
     "relationship-intelligence",
     "strategic-memory",
@@ -19,10 +22,9 @@ keywords = [
     "organizational-politics",
     "graph-analysis",
     "flask",
-    "llm",
-    "gemini",
-    "openai",
-    "claude"
+    "claude",
+    "cursor",
+    "llm"
 ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -41,6 +43,7 @@ dependencies = [
     "networkx>=3.2",
     "numpy>=1.26",
     "scipy>=1.12",
+    "mcp[cli]>=1.2.0",
 ]
 
 [project.urls]
@@ -48,6 +51,10 @@ Homepage = "https://github.com/adacreativeco/strategic-memory-crm"
 Repository = "https://github.com/adacreativeco/strategic-memory-crm"
 Documentation = "https://github.com/adacreativeco/strategic-memory-crm#readme"
 "Bug Tracker" = "https://github.com/adacreativeco/strategic-memory-crm/issues"
+
+[project.scripts]
+strategic-memory-crm = "app:main"
+strategic-memory-mcp = "mcp_server:main"
 
 [build-system]
 requires = ["hatchling"]
