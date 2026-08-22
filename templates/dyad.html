@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title %}Dyadic Comparison & Alignment Matrix — Strategic Memory CRM{% endblock %}
+
+{% block content %}
+<div class="dashboard-header-row">
+    <div>
+        <h1>⚖️ Dyadic Comparison & Alignment Matrix</h1>
+        <p class="subtitle">Side-by-side psychometric evaluation, negotiation compatibility, and reciprocal trust</p>
+    </div>
+</div>
+
+<div class="card dyad-selector-card">
+    <form method="GET" action="/dyad" class="dyad-form">
+        <div class="form-group flex-1">
+            <label>Stakeholder 1</label>
+            <select name="src" class="form-control" onchange="this.form.submit()">
+                {% for s in stakeholders %}
+                <option value="{{ s.id }}" {% if s.id == src_id %}selected{% endif %}>{{ s.name }} ({{ s.organization }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="dyad-vs">VS</div>
+        <div class="form-group flex-1">
+            <label>Stakeholder 2</label>
+            <select name="tgt" class="form-control" onchange="this.form.submit()">
+                {% for s in stakeholders %}
+                <option value="{{ s.id }}" {% if s.id == tgt_id %}selected{% endif %}>{{ s.name }} ({{ s.organization }})</option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
+</div>
+
+<div id="dyad-content" class="dyad-results-area">
+    <p class="text-muted text-center">Loading comparison data...</p>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+    const params = new URLSearchParams(window.location.search);
+    const src = params.get('src') || '{{ src_id }}';
+    const tgt = params.get('tgt') || '{{ tgt_id }}';
+
+    try {
+        const res = await fetch(`/api/dyad?src=${src}&tgt=${tgt}`);
+        const data = await res.json();
+        renderDyad(data);
+    } catch (err) {
+        document.getElementById('dyad-content').innerHTML = `<div class="card alert alert-danger">Error loading comparison: ${err.message}</div>`;
+    }
+});
+
+function renderDyad(data) {
+    if (data.error) {
+        document.getElementById('dyad-content').innerHTML = `<div class="card alert alert-danger">${data.error}</div>`;
+        return;
+    }
+
+    const s1 = data.stakeholder_1;
+    const s2 = data.stakeholder_2;
+    const dyn = data.dyadic_dynamics;
+
+    document.getElementById('dyad-content').innerHTML = `
+        <div class="card dyad-overview-card">
+            <h3>🤝 Direct Relationship Dynamics</h3>
+            <div class="dyad-trust-bar-row">
+                <div class="trust-side">
+                    <span class="t-name">${s1.name} &rarr; ${s2.name} Trust:</span>
+                    <span class="badge badge-success">${dyn.trust_s1_in_s2}</span>
+                </div>
+                <div class="reciprocity-meter">
+                    <span>Reciprocity Balance: <strong>${dyn.reciprocity_balance}</strong></span>
+                </div>
+                <div class="trust-side">
+                    <span class="t-name">${s2.name} &rarr; ${s1.name} Trust:</span>
+                    <span class="badge badge-success">${dyn.trust_s2_in_s1}</span>
+                </div>
+            </div>
+
+            <div class="dyad-allies-row">
+                <div>
+                    <span class="text-muted">Mutual Allies:</span>
+                    ${dyn.shared_allies.length ? dyn.shared_allies.map(a => `<span class="badge badge-success">${a}</span>`).join(' ') : '<span class="text-muted">None</span>'}
+                </div>
+                <div>
+                    <span class="text-muted">Shared Rivals:</span>
+                    ${dyn.shared_rivals.length ? dyn.shared_rivals.map(r => `<span class="badge badge-danger">${r}</span>`).join(' ') : '<span class="text-muted">None</span>'}
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-2-col">
+            <div class="card stakeholder-side-card">
+                <div class="side-header">
+                    <h2><a href="/stakeholder/${s1.id}">${s1.name}</a></h2>
+                    <span class="badge badge-tier">${s1.tier}</span>
+                </div>
+                <p class="subtitle">${s1.role} &mdash; ${s1.organization}</p>
+
+                <div class="meta-list">
+                    <div><strong>Negotiation Style:</strong> <code>${s1.dominant_style.toUpperCase()}</code></div>
+                    <div><strong>Reliability Score:</strong> ${(s1.reliability_score * 100).toFixed(0)}%</div>
+                    <div><strong>Risk Score:</strong> <span class="badge ${s1.risk_score > 0.5 ? 'badge-danger' : 'badge-success'}">${s1.risk_score}</span></div>
+                </div>
+
+                <h4 class="subhead">Psychometrics</h4>
+                <div class="traits-bars">
+                    ${Object.entries(s1.personality).map(([k, v]) => `
+                        <div class="trait-row">
+                            <span class="trait-name">${k.replace('_', ' ')}</span>
+                            <div class="trait-bar-wrap">
+                                <div class="trait-bar" style="width: ${v * 100}%;"></div>
+                            </div>
+                            <span class="trait-val">${(v * 100).toFixed(0)}%</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+
+            <div class="card stakeholder-side-card">
+                <div class="side-header">
+                    <h2><a href="/stakeholder/${s2.id}">${s2.name}</a></h2>
+                    <span class="badge badge-tier">${s2.tier}</span>
+                </div>
+                <p class="subtitle">${s2.role} &mdash; ${s2.organization}</p>
+
+                <div class="meta-list">
+                    <div><strong>Negotiation Style:</strong> <code>${s2.dominant_style.toUpperCase()}</code></div>
+                    <div><strong>Reliability Score:</strong> ${(s2.reliability_score * 100).toFixed(0)}%</div>
+                    <div><strong>Risk Score:</strong> <span class="badge ${s2.risk_score > 0.5 ? 'badge-danger' : 'badge-success'}">${s2.risk_score}</span></div>
+                </div>
+
+                <h4 class="subhead">Psychometrics</h4>
+                <div class="traits-bars">
+                    ${Object.entries(s2.personality).map(([k, v]) => `
+                        <div class="trait-row">
+                            <span class="trait-name">${k.replace('_', ' ')}</span>
+                            <div class="trait-bar-wrap">
+                                <div class="trait-bar" style="width: ${v * 100}%;"></div>
+                            </div>
+                            <span class="trait-val">${(v * 100).toFixed(0)}%</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
+    `;
+}
+</script>
+{% endblock %}

@@ -1,11 +1,17 @@
-"""Strategic Memory CRM — FastMCP Server.
+"""Strategic Memory CRM — Unified MCP Server & Web CLI Entry Point.
 
-Exposes behavioral intelligence, trust dynamics, organizational politics,
-and negotiation battleplans over the Model Context Protocol (MCP).
+Run directly for MCP stdio mode (Claude Desktop, Cursor, Antigravity):
+    python mcp_server.py
+    uvx strategic-memory-crm
+
+Run with --web to launch the Flask Web Dashboard:
+    python mcp_server.py --web
+    strategic-memory-crm --web
 """
 
 from __future__ import annotations
 
+import argparse
 import io
 import json
 import sys
@@ -27,7 +33,7 @@ from strategic_memory_crm.models import CRMState
 from strategic_memory_crm.storage import load_state_from_file, save_state_to_file
 from strategic_memory_crm import mcp_tools
 
-# Data storage path
+# Data storage path (resolves locally or relative to package)
 DATA_DIR = Path(__file__).parent / "data"
 DATA_FILE = DATA_DIR / "crm_state.json"
 
@@ -157,9 +163,60 @@ def generate_tactical_briefing(stakeholder_id: str, meeting_objective: str = "")
     return json.dumps(res, indent=2, ensure_ascii=False)
 
 
+
+
+@mcp.tool()
+def simulate_scenario(
+    scenario_type: str,
+    source_id: str,
+    target_id: Optional[str] = None,
+    severity: float = 1.0,
+    time_lapse_days: int = 0,
+    description: str = ""
+) -> str:
+    """Run a predictive what-if simulation (scenario_type: 'conflict', 'broken_commitment', 'kept_commitment', 'strategic_favor', 'betrayal', 'passive_decay') to project network entropy shifts, trust ripples, contagion nodes, and tactical containment advice."""
+    state = get_state()
+    res = mcp_tools.simulate_scenario(
+        state=state,
+        scenario_type=scenario_type,
+        source_id=source_id,
+        target_id=target_id,
+        severity=severity,
+        time_lapse_days=time_lapse_days,
+        description=description
+    )
+    return json.dumps(res, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def get_coalition_radar() -> str:
+    """Analyze corporate factions, informal voting blocs, collective decision power share (%), faction leaders, and weakest links in the network."""
+    state = get_state()
+    res = mcp_tools.get_coalition_radar(state)
+    return json.dumps(res, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def compare_stakeholders(source_id: str, target_id: str) -> str:
+    """Compare two stakeholders side-by-side: Big-Five psychometrics, negotiation typologies, bidirectional trust scores, reciprocity balance, and shared allies/rivals."""
+    state = get_state()
+    res = mcp_tools.compare_stakeholders(state, source_id, target_id)
+    return json.dumps(res, indent=2, ensure_ascii=False)
+
+
 def main() -> None:
-    """CLI / stdio entry point for the MCP server."""
-    mcp.run()
+    """CLI Entry Point: default is MCP stdio server; if --web passed, launches Flask dashboard."""
+    parser = argparse.ArgumentParser(description="Strategic Memory CRM — Behavioral Intelligence & MCP Server")
+    parser.add_argument("--web", action="store_true", help="Launch the Flask web dashboard instead of MCP stdio server")
+    parser.add_argument("--port", type=int, default=5088, help="Port for the web dashboard (default: 5088)")
+    args, unknown = parser.parse_known_args()
+
+    if args.web:
+        from app import app
+        print(f"🚀 Starting Strategic Memory CRM Web Dashboard on http://localhost:{args.port}")
+        app.run(host="0.0.0.0", port=args.port, debug=False)
+    else:
+        mcp.run()
 
 
 if __name__ == "__main__":

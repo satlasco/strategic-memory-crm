@@ -5,22 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Strategic Memory CRM{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     {% block head %}{% endblock %}
 </head>
 <body>
     <nav class="navbar">
-        <a href="/" class="nav-brand">Strategic Memory CRM</a>
+        <a href="/" class="nav-brand">
+            <span class="brand-logo">🧠</span>
+            <span class="brand-text">Strategic Memory <span class="brand-accent">CRM</span></span>
+        </a>
         <div class="nav-links">
-            <a href="/">Dashboard</a>
-            <a href="/graph">Stakeholder Graph</a>
-            <a href="/api/state" target="_blank">API</a>
+            <a href="/" class="{% if request.path == '/' %}active{% endif %}">📊 Dashboard</a>
+            <a href="/graph" class="{% if request.path == '/graph' %}active{% endif %}">🕸️ Network Graph</a>
+            <a href="/coalitions" class="{% if request.path == '/coalitions' %}active{% endif %}">🛡️ Coalition Radar</a>
+            <a href="/simulator" class="{% if request.path == '/simulator' %}active{% endif %}">🔮 Scenario Simulator</a>
+            <a href="/dyad" class="{% if request.path == '/dyad' %}active{% endif %}">⚖️ Dyad Comparison</a>
+            <a href="/api/state" target="_blank" class="nav-badge-link">🔌 API / MCP</a>
         </div>
     </nav>
     <main class="container">
         {% block content %}{% endblock %}
     </main>
     <footer class="footer">
-        <p>Strategic Memory CRM &mdash; Relationship Intelligence Prototype</p>
+        <div class="container footer-content">
+            <p>Strategic Memory CRM &mdash; Behavioral Intelligence & Relationship Risk Platform</p>
+            <p class="footer-sub">Developed by <a href="https://github.com/adacreativeco" target="_blank">ADA Creative Co.</a></p>
+        </div>
     </footer>
     {% block scripts %}{% endblock %}
 </body>

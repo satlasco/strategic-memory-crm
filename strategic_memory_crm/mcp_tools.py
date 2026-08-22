@@ -464,3 +464,89 @@ def generate_tactical_briefing(state: CRMState, stakeholder_id: str, meeting_obj
             "risk_score": round(risk_score, 2)
         }
     }
+
+
+def simulate_scenario(
+    state: CRMState,
+    scenario_type: str,
+    source_id: str,
+    target_id: Optional[str] = None,
+    severity: float = 1.0,
+    time_lapse_days: int = 0,
+    description: str = ""
+) -> dict[str, Any]:
+    """Runs a predictive what-if scenario (conflict, broken_commitment, strategic_favor, betrayal, passive_decay) and returns before/after network entropy, trust shifts, contagion nodes, and mitigation advice."""
+    from strategic_memory_crm.scenario_simulator import simulate_what_if
+    return simulate_what_if(
+        state=state,
+        scenario_type=scenario_type,
+        source_id=source_id,
+        target_id=target_id,
+        severity=severity,
+        time_lapse_days=time_lapse_days,
+        description=description
+    )
+
+
+def get_coalition_radar(state: CRMState) -> dict[str, Any]:
+    """Analyzes organizational factions, collective decision power distribution, faction leaders, and weakest links in the network."""
+    from strategic_memory_crm.coalitions import analyze_coalitions_and_power
+    return analyze_coalitions_and_power(state)
+
+
+def compare_stakeholders(state: CRMState, source_id: str, target_id: str) -> dict[str, Any]:
+    """Compares two stakeholders side-by-side: psychometrics, negotiation styles, reciprocal trust, and power dynamics."""
+    sid1 = _resolve_sid(state, source_id)
+    sid2 = _resolve_sid(state, target_id)
+
+    if not sid1 or not sid2 or sid1 not in state.stakeholders or sid2 not in state.stakeholders:
+        return {"error": f"Could not resolve stakeholders '{source_id}' and/or '{target_id}'."}
+
+    s1 = state.stakeholders[sid1]
+    s2 = state.stakeholders[sid2]
+
+    prof1 = build_negotiation_profile(state, sid1)
+    prof2 = build_negotiation_profile(state, sid2)
+
+    risk_map = full_risk_report(state)
+    r1 = risk_map.get(sid1)
+    r2 = risk_map.get(sid2)
+
+    rel_direct = state.relationships.get((sid1, sid2))
+    rel_reverse = state.relationships.get((sid2, sid1))
+
+    # Shared allies / rivals
+    shared_allies = list(set(s1.allies).intersection(set(s2.allies)))
+    shared_rivals = list(set(s1.rivals).intersection(set(s2.rivals)))
+
+    return {
+        "stakeholder_1": {
+            "id": sid1,
+            "name": s1.name,
+            "role": s1.role,
+            "organization": s1.organization,
+            "tier": s1.tier.value,
+            "personality": s1.personality,
+            "dominant_style": prof1.dominant_style,
+            "reliability_score": round(prof1.reliability_score, 2),
+            "risk_score": round(r1.risk_score, 2) if r1 else 0.2
+        },
+        "stakeholder_2": {
+            "id": sid2,
+            "name": s2.name,
+            "role": s2.role,
+            "organization": s2.organization,
+            "tier": s2.tier.value,
+            "personality": s2.personality,
+            "dominant_style": prof2.dominant_style,
+            "reliability_score": round(prof2.reliability_score, 2),
+            "risk_score": round(r2.risk_score, 2) if r2 else 0.2
+        },
+        "dyadic_dynamics": {
+            "trust_s1_in_s2": round(rel_direct.trust_score, 2) if rel_direct else 0.5,
+            "trust_s2_in_s1": round(rel_reverse.trust_score, 2) if rel_reverse else 0.5,
+            "reciprocity_balance": round(rel_direct.reciprocity_balance, 2) if rel_direct else 0.0,
+            "shared_allies": [state.stakeholders[a].name for a in shared_allies if a in state.stakeholders],
+            "shared_rivals": [state.stakeholders[rv].name for rv in shared_rivals if rv in state.stakeholders]
+        }
+    }

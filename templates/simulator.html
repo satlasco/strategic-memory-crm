@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+{% block title %}What-If Scenario Simulator — Strategic Memory CRM{% endblock %}
+
+{% block content %}
+<div class="dashboard-header-row">
+    <div>
+        <h1>🔮 What-If Scenario Simulator</h1>
+        <p class="subtitle">Model hypothetical corporate moves, conflicts, broken promises, and time-lapses before execution</p>
+    </div>
+</div>
+
+<div class="simulator-layout">
+    <div class="card sim-controls-card">
+        <h3>⚙️ Scenario Parameters</h3>
+        <form id="sim-form" onsubmit="runSimulation(event)">
+            <div class="form-group">
+                <label>Scenario Type</label>
+                <select id="sim-type" class="form-control" onchange="toggleTargetSelect()">
+                    <option value="conflict">⚔️ Open Conflict / Confrontation</option>
+                    <option value="broken_commitment">💔 Broken Promise / Commitment Breach</option>
+                    <option value="kept_commitment">🤝 Kept Major Commitment</option>
+                    <option value="strategic_favor">🎁 Strategic Unreciprocated Favor</option>
+                    <option value="betrayal">🚨 Severe Trust Betrayal</option>
+                    <option value="passive_decay">⏳ Time-Lapse Relationship Decay (No Contact)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Primary Actor (Source)</label>
+                <select id="sim-source" class="form-control" required>
+                    {% for s in stakeholders %}
+                    <option value="{{ s.id }}">{{ s.name }} ({{ s.organization }} — {{ s.role }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group" id="target-group">
+                <label>Counterparty (Target)</label>
+                <select id="sim-target" class="form-control">
+                    {% for s in stakeholders %}
+                    <option value="{{ s.id }}" {% if loop.index == 2 %}selected{% endif %}>{{ s.name }} ({{ s.organization }} — {{ s.role }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Scenario Severity / Scale (<span id="severity-val">1.0x</span>)</label>
+                <input type="range" id="sim-severity" min="0.5" max="2.0" step="0.1" value="1.0" class="form-range" oninput="document.getElementById('severity-val').innerText = this.value + 'x'">
+            </div>
+
+            <div class="form-group" id="timelapse-group" style="display: none;">
+                <label>Time Lapse (Days)</label>
+                <input type="number" id="sim-days" class="form-control" value="60" min="1" max="365">
+            </div>
+
+            <div class="form-group">
+                <label>Scenario Context / Note (Optional)</label>
+                <input type="text" id="sim-desc" class="form-control" placeholder="e.g. Challenged integration milestone in steering committee">
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" id="run-sim-btn">⚡ Run Simulation</button>
+        </form>
+    </div>
+
+    <div class="sim-results-area" id="sim-results">
+        <div class="card empty-state-card">
+            <div class="empty-icon">🔮</div>
+            <h3>Ready for Predictive Simulation</h3>
+            <p>Select scenario parameters on the left and click <strong>Run Simulation</strong> to compute network entropy shifts, trust ripples, contagion exposure, and tactical mitigation strategies.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function toggleTargetSelect() {
+    const type = document.getElementById('sim-type').value;
+    const tgtGroup = document.getElementById('target-group');
+    const timeGroup = document.getElementById('timelapse-group');
+    if (type === 'passive_decay') {
+        tgtGroup.style.display = 'none';
+        timeGroup.style.display = 'block';
+    } else {
+        tgtGroup.style.display = 'block';
+        timeGroup.style.display = 'none';
+    }
+}
+
+async function runSimulation(e) {
+    e.preventDefault();
+    const btn = document.getElementById('run-sim-btn');
+    btn.innerText = '⏳ Simulating...';
+    btn.disabled = true;
+
+    const payload = {
+        scenario_type: document.getElementById('sim-type').value,
+        source_id: document.getElementById('sim-source').value,
+        target_id: document.getElementById('sim-target').value,
+        severity: parseFloat(document.getElementById('sim-severity').value),
+        time_lapse_days: parseInt(document.getElementById('sim-days').value || 0),
+        description: document.getElementById('sim-desc').value
+    };
+
+    try {
+        const res = await fetch('/api/simulator/run', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        renderResults(data);
+    } catch (err) {
+        alert('Simulation failed: ' + err.message);
+    } finally {
+        btn.innerText = '⚡ Run Simulation';
+        btn.disabled = false;
+    }
+}
+
+function renderResults(data) {
+    const container = document.getElementById('sim-results');
+    if (data.error) {
+        container.innerHTML = `<div class="card alert alert-danger">${data.error}</div>`;
+        return;
+    }
+
+    const imp = data.impact_summary;
+    const sc = data.scenario;
+
+    let riskRows = '';
+    (data.risk_shifts || []).forEach(r => {
+        const deltaClass = r.delta > 0 ? 'badge-danger' : 'badge-success';
+        const deltaSign = r.delta > 0 ? '+' : '';
+        riskRows += `
+            <tr>
+                <td><strong>${r.stakeholder_name}</strong></td>
+                <td>${r.baseline_risk}</td>
+                <td><strong>${r.simulated_risk}</strong></td>
+                <td><span class="badge ${deltaClass}">${deltaSign}${r.delta}</span></td>
+            </tr>
+        `;
+    });
+
+    let trustRows = '';
+    (data.trust_shifts || []).forEach(t => {
+        const deltaClass = t.delta < 0 ? 'badge-danger' : 'badge-success';
+        const deltaSign = t.delta > 0 ? '+' : '';
+        trustRows += `
+            <tr>
+                <td><strong>${t.from_name} &rarr; ${t.to_name}</strong></td>
+                <td>${t.baseline_trust}</td>
+                <td><strong>${t.simulated_trust}</strong></td>
+                <td><span class="badge ${deltaClass}">${deltaSign}${t.delta}</span></td>
+            </tr>
+        `;
+    });
+
+    let mitigationsHtml = '';
+    (data.strategic_mitigations || []).forEach(m => {
+        mitigationsHtml += `<li>🛡️ ${m}</li>`;
+    });
+
+    let contagionHtml = '';
+    (data.contagion_exposure || []).forEach(c => {
+        contagionHtml += `
+            <div class="contagion-chip">
+                <strong>${c.name}</strong> (${c.role})
+                <span class="badge badge-warning">${c.political_risk}</span>
+            </div>
+        `;
+    });
+
+    container.innerHTML = `
+        <div class="card sim-summary-card">
+            <div class="sim-header">
+                <h3>📊 Simulated Impact: ${sc.type.replace('_', ' ').toUpperCase()}</h3>
+                <span class="badge ${imp.entropy_delta > 0.03 ? 'badge-danger' : 'badge-success'}">${imp.stability_status}</span>
+            </div>
+            <p class="text-muted">${sc.simulated_events.join(' ')}</p>
+
+            <div class="impact-metrics-grid">
+                <div class="metric-box">
+                    <span class="m-label">Baseline Entropy</span>
+                    <span class="m-val">${imp.baseline_entropy}</span>
+                </div>
+                <div class="metric-box">
+                    <span class="m-label">Simulated Entropy</span>
+                    <span class="m-val">${imp.simulated_entropy}</span>
+                </div>
+                <div class="metric-box highlight">
+                    <span class="m-label">Entropy Delta (ΔH)</span>
+                    <span class="m-val ${imp.entropy_delta > 0 ? 'text-danger' : 'text-success'}">${imp.entropy_delta > 0 ? '+' : ''}${imp.entropy_delta}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-grid">
+            <div class="card">
+                <h4>⚠️ Stakeholder Risk Shifts</h4>
+                ${riskRows ? `
+                    <table class="data-table">
+                        <thead><tr><th>Stakeholder</th><th>Base</th><th>Post</th><th>Δ</th></tr></thead>
+                        <tbody>${riskRows}</tbody>
+                    </table>
+                ` : '<p class="text-muted">No significant risk shifts detected.</p>'}
+            </div>
+
+            <div class="card">
+                <h4>🤝 Trust Shifts Across Pairs</h4>
+                ${trustRows ? `
+                    <table class="data-table">
+                        <thead><tr><th>Relationship</th><th>Base</th><th>Post</th><th>Δ</th></tr></thead>
+                        <tbody>${trustRows}</tbody>
+                    </table>
+                ` : '<p class="text-muted">No major trust shifts.</p>'}
+            </div>
+        </div>
+
+        ${contagionHtml ? `
+        <div class="card">
+            <h4>💥 Second-Degree Contagion Exposure</h4>
+            <p class="text-muted">Mutual allies and adjacent stakeholders vulnerable to ripple effects:</p>
+            <div class="contagion-list">${contagionHtml}</div>
+        </div>
+        ` : ''}
+
+        <div class="card playbook-card">
+            <h4>🎯 Strategic Mitigation Playbook</h4>
+            <ul class="mitigation-list">${mitigationsHtml || '<li>Network remains stable; proceed with planned engagement roadmap.</li>'}</ul>
+        </div>
+    `;
+}
+</script>
+{% endblock %}

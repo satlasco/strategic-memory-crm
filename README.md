@@ -8,9 +8,9 @@
 [![Flask](https://img.shields.io/badge/Flask-3.0+-000000?style=for-the-badge&logo=flask&logoColor=white)](https://palletsprojects.com/p/flask/)
 [![NetworkX](https://img.shields.io/badge/NetworkX-3.2+-blue?style=for-the-badge&logo=python)](https://networkx.org/)
 [![License](https://img.shields.io/badge/License-Apache_2.0-10b981?style=for-the-badge)](LICENSE)
-[![Tests](https://img.shields.io/badge/Tests-25%20Passed-success?style=for-the-badge&logo=pytest&logoColor=white)](tests/test_crm.py)
+[![Tests](https://img.shields.io/badge/Tests-31%20Passed-success?style=for-the-badge&logo=pytest&logoColor=white)](tests/test_crm.py)
 [![GitHub Stars](https://img.shields.io/github/stars/adacreativeco/strategic-memory-crm?style=for-the-badge&color=ffd700)](https://github.com/adacreativeco/strategic-memory-crm/stargazers)
-[![Release](https://img.shields.io/badge/Release-v1.1.0-6366f1?style=for-the-badge)](https://github.com/adacreativeco/strategic-memory-crm/releases)
+[![Release](https://img.shields.io/badge/Release-v1.2.0-6366f1?style=for-the-badge)](https://github.com/adacreativeco/strategic-memory-crm/releases)
 
 <br/>
 
@@ -116,6 +116,9 @@ Strategic Memory CRM acts as a dedicated **AI Relationship Memory Layer** over M
 | `get_stakeholder_intel` | `stakeholder_id` *(id or name)* | Comprehensive behavioral intelligence report: trust ties, psychometrics, reliability, risk drivers, allies, and rivals. |
 | `get_organization_politics` | *None* | NetworkX power map: top informal influencers (PageRank), information bridges & gatekeepers (betweenness), and hidden coalitions. |
 | `analyze_relationship` | `source_id`, `target_id` | Deep dyadic analysis: asymmetric trust scores, reciprocity balance, Shannon entropy (volatility), and shared interaction history. |
+| `simulate_scenario` | `scenario_type`, `source_id`, `target_id`... | Predictive What-If simulation: projects network entropy shifts, trust ripples, contagion exposure, and containment advice. |
+| `get_coalition_radar` | *None* | Faction power analysis: collective decision power share (%), faction leaders, and vulnerable bridge nodes (weakest links). |
+| `compare_stakeholders` | `source_id`, `target_id` | Side-by-side comparison: psychometrics, negotiation styles, bidirectional trust scores, and mutual allies/rivals. |
 | `log_interaction` | `source_id`, `target_id`, `interaction_type`, `summary`, `sentiment`, `commitments_kept`... | Logs a new meeting/call/favor/conflict, recalculates trust decay/growth, updates reciprocity balance, and saves to database. |
 | `add_stakeholder` | `name`, `role`, `organization`, `org_tier`, `personality`, `goals`... | Creates a new stakeholder profile in the strategic memory database with personality traits. |
 | `generate_tactical_briefing` | `stakeholder_id`, `meeting_objective` | Generates an executive pre-meeting negotiation battleplan, power lever analysis, and critical pitfalls. |

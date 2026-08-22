@@ -103,5 +103,27 @@ class TestMCPTools(unittest.TestCase):
         self.assertIn("Executive Strategic Briefing", briefing_res["briefing"])
 
 
+
+    def test_mcp_simulate_scenario(self):
+        sids = list(self.state.stakeholders.keys())
+        s1, s2 = sids[0], sids[1]
+        res = mcp_tools.simulate_scenario(self.state, "broken_commitment", s1, s2)
+        self.assertEqual(res.get("status"), "success")
+        self.assertIn("impact_summary", res)
+
+    def test_mcp_get_coalition_radar(self):
+        res = mcp_tools.get_coalition_radar(self.state)
+        self.assertIn("balance_of_power", res)
+
+    def test_mcp_compare_stakeholders(self):
+        sids = list(self.state.stakeholders.keys())
+        s1, s2 = sids[0], sids[1]
+        res = mcp_tools.compare_stakeholders(self.state, s1, s2)
+        self.assertNotIn("error", res)
+        self.assertIn("stakeholder_1", res)
+        self.assertIn("stakeholder_2", res)
+        self.assertIn("dyadic_dynamics", res)
+
+
 if __name__ == "__main__":
     unittest.main()

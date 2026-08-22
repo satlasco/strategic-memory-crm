@@ -504,3 +504,70 @@ def run_app(port: int = 5088):
 
 if __name__ == "__main__":
     run_app()
+
+
+# --- Advanced Analytics & Simulation Routes ---
+
+@app.route("/simulator")
+def page_simulator():
+    """Renders the What-If Predictive Scenario Simulator."""
+    sh_list = sorted(STATE.stakeholders.values(), key=lambda s: s.name)
+    return render_template("simulator.html", stakeholders=sh_list)
+
+
+@app.route("/api/simulator/run", methods=["POST"])
+def api_run_simulation():
+    """Runs a predictive what-if scenario on a clone of CRMState."""
+    from strategic_memory_crm.scenario_simulator import simulate_what_if
+    data = request.get_json() or {}
+    stype = data.get("scenario_type", "conflict")
+    src = data.get("source_id")
+    tgt = data.get("target_id")
+    sev = float(data.get("severity", 1.0))
+    days = int(data.get("time_lapse_days", 0))
+    desc = data.get("description", "")
+
+    result = simulate_what_if(
+        state=STATE,
+        scenario_type=stype,
+        source_id=src,
+        target_id=tgt,
+        severity=sev,
+        time_lapse_days=days,
+        description=desc
+    )
+    return jsonify(result)
+
+
+@app.route("/coalitions")
+def page_coalitions():
+    """Renders the Coalition Radar and Balance of Power dashboard."""
+    from strategic_memory_crm.coalitions import analyze_coalitions_and_power
+    data = analyze_coalitions_and_power(STATE)
+    return render_template("coalitions.html", data=data)
+
+
+@app.route("/api/coalitions", methods=["GET"])
+def api_get_coalitions():
+    """Returns organizational faction and power balance analysis as JSON."""
+    from strategic_memory_crm.coalitions import analyze_coalitions_and_power
+    return jsonify(analyze_coalitions_and_power(STATE))
+
+
+@app.route("/dyad")
+def page_dyad():
+    """Renders the Dyadic Comparison & Alignment Matrix."""
+    sh_list = sorted(STATE.stakeholders.values(), key=lambda s: s.name)
+    src_id = request.args.get("src") or (sh_list[0].id if sh_list else "")
+    tgt_id = request.args.get("tgt") or (sh_list[1].id if len(sh_list) > 1 else "")
+    return render_template("dyad.html", stakeholders=sh_list, src_id=src_id, tgt_id=tgt_id)
+
+
+@app.route("/api/dyad", methods=["GET"])
+def api_get_dyad():
+    """Returns side-by-side dyadic comparison data for two stakeholders."""
+    src_id = request.args.get("src")
+    tgt_id = request.args.get("tgt")
+    from strategic_memory_crm import mcp_tools
+    res = mcp_tools.compare_stakeholders(STATE, src_id, tgt_id)
+    return jsonify(res)

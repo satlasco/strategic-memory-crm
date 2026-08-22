@@ -8,9 +8,9 @@
 [![Flask](https://img.shields.io/badge/Flask-3.0+-000000?style=for-the-badge&logo=flask&logoColor=white)](https://palletsprojects.com/p/flask/)
 [![NetworkX](https://img.shields.io/badge/NetworkX-3.2+-blue?style=for-the-badge&logo=python)](https://networkx.org/)
 [![License](https://img.shields.io/badge/License-Apache_2.0-10b981?style=for-the-badge)](LICENSE)
-[![Tests](https://img.shields.io/badge/Tests-25%20Geçti-success?style=for-the-badge&logo=pytest&logoColor=white)](tests/test_crm.py)
+[![Tests](https://img.shields.io/badge/Tests-31%20Geçti-success?style=for-the-badge&logo=pytest&logoColor=white)](tests/test_crm.py)
 [![GitHub Stars](https://img.shields.io/github/stars/adacreativeco/strategic-memory-crm?style=for-the-badge&color=ffd700)](https://github.com/adacreativeco/strategic-memory-crm/stargazers)
-[![Release](https://img.shields.io/badge/Sürüm-v1.1.0-6366f1?style=for-the-badge)](https://github.com/adacreativeco/strategic-memory-crm/releases)
+[![Release](https://img.shields.io/badge/Sürüm-v1.2.0-6366f1?style=for-the-badge)](https://github.com/adacreativeco/strategic-memory-crm/releases)
 
 <br/>
 
@@ -116,6 +116,9 @@ Strategic Memory CRM, yapay zekâ asistanları için **Stratejik İlişki Hafız
 | `get_stakeholder_intel` | `stakeholder_id` *(id veya isim)* | Bir paydaş hakkında derin istihbarat sunar (güven bağları, müzakere stili, güvenilirlik, risk faktörleri, müttefik/rakipler). |
 | `get_organization_politics` | *Yok* | NetworkX destekli yapısal güç haritasını çıkarır (PageRank ile gayriresmi liderler, bilgi bekçileri, aracılar, koalisyonlar). |
 | `analyze_relationship` | `source_id`, `target_id` | İki kişi arasındaki ikili ilişkiyi analiz eder (yönlü güven, iyilik dengesi, entropi/volatilite, etkileşim geçmişi). |
+| `simulate_scenario` | `scenario_type`, `source_id`, `target_id`... | "What-If" Kriz & Müzakere Simülatörü: ağ entropi kaymalarını, güven dalgalanmasını ve hasar kontrol önerilerini hesaplar. |
+| `get_coalition_radar` | *Yok* | Koalisyon güç analizi: kliklerin toplam karar gücü payı (%), liderler ve en zayıf halka (weakest link) tespiti. |
+| `compare_stakeholders` | `source_id`, `target_id` | İkili lider karşılaştırması: psikometri, müzakere arketipi, karşılıklı güven ve ortak müttefik/rakipler. |
 | `log_interaction` | `source_id`, `target_id`, `interaction_type`, `summary`, `sentiment`... | Yeni görüşme, arama veya taahhütleri dinamik güven sönümlemesi ve karşılıklılık güncellemeleriyle kaydeder. |
 | `add_stakeholder` | `name`, `role`, `organization`, `org_tier`, `personality`... | Stratejik hafıza veritabanına kişilik özellikleriyle birlikte yeni bir paydaş ekler. |
 | `generate_tactical_briefing` | `stakeholder_id`, `meeting_objective` | Toplantı öncesi anlık psikometrik müzakere savaş planı ve taktiksel kaldıraç noktaları üretir. |

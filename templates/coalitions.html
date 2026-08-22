@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Coalition Radar & Balance of Power — Strategic Memory CRM{% endblock %}
+
+{% block content %}
+<div class="dashboard-header-row">
+    <div>
+        <h1>🛡️ Coalition Radar & Balance of Power</h1>
+        <p class="subtitle">Informal power factions, collective decision weight, and network vulnerability analysis</p>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-value">{{ data.total_factions }}</div>
+        <div class="stat-label">Identified Factions</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ data.key_gatekeepers|length }}</div>
+        <div class="stat-label">Key Gatekeepers</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ data.key_brokers|length }}</div>
+        <div class="stat-label">Communication Brokers</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ data.total_stakeholders }}</div>
+        <div class="stat-label">Active Stakeholders</div>
+    </div>
+</div>
+
+<h2 class="section-title">📊 Faction Power Distribution</h2>
+<div class="factions-grid">
+    {% for f in data.balance_of_power %}
+    <div class="card faction-card">
+        <div class="faction-header">
+            <div>
+                <h3>{{ f.name }}</h3>
+                <span class="badge badge-tier">{{ f.member_count }} Members</span>
+            </div>
+            <div class="power-pill">
+                <span class="power-pct">{{ f.power_share_percentage }}%</span>
+                <span class="power-label">Power Share</span>
+            </div>
+        </div>
+
+        <div class="power-bar-container">
+            <div class="power-bar" style="width: {{ f.power_share_percentage }}%;"></div>
+        </div>
+
+        <div class="faction-meta-grid">
+            <div class="f-meta-item">
+                <span class="f-meta-label">Primary Leader:</span>
+                <strong>{{ f.primary_leader }}</strong>
+            </div>
+            <div class="f-meta-item">
+                <span class="f-meta-label">Internal Cohesion (Trust):</span>
+                <span class="badge badge-success">{{ f.cohesion_internal_trust }}</span>
+            </div>
+            {% if f.weakest_link %}
+            <div class="f-meta-item full-width">
+                <span class="f-meta-label">⚠️ Weakest Link (Vulnerable Bridge):</span>
+                <strong class="text-warning">{{ f.weakest_link.name }}</strong> ({{ f.weakest_link.role }}) &mdash; Risk: {{ f.weakest_link.risk_score }}
+            </div>
+            {% endif %}
+        </div>
+
+        <h4 class="f-subhead">Members & Influence</h4>
+        <ul class="faction-members-list">
+            {% for m in f.members %}
+            <li>
+                <a href="/stakeholder/{{ m.id }}"><strong>{{ m.name }}</strong></a>
+                <span class="text-muted">{{ m.role }} ({{ m.organization }})</span>
+                <div class="m-badges">
+                    {% if m.is_gatekeeper %}<span class="badge badge-danger">Gatekeeper</span>{% endif %}
+                    {% if m.is_broker %}<span class="badge badge-warning">Broker</span>{% endif %}
+                    <span class="badge badge-tier">PR: {{ m.pagerank }}</span>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="grid-2-col" style="margin-top: 2rem;">
+    <div class="card">
+        <h3>🚪 Network Gatekeepers (Bottlenecks)</h3>
+        <p class="text-muted">Stakeholders who control information flow and access to executive decision-makers:</p>
+        <ul class="simple-list">
+            {% for g in data.key_gatekeepers %}
+            <li><a href="/stakeholder/{{ g.id }}"><strong>{{ g.name }}</strong></a> &mdash; {{ g.role }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="card">
+        <h3>🌉 Cross-Faction Brokers (Bridge Nodes)</h3>
+        <p class="text-muted">Articulation points whose departure or alienation would partition the network:</p>
+        <ul class="simple-list">
+            {% for b in data.key_brokers %}
+            <li><a href="/stakeholder/{{ b.id }}"><strong>{{ b.name }}</strong></a> &mdash; {{ b.role }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}
