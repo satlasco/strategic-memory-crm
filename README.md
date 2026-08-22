@@ -32,41 +32,96 @@ Built for strategists, executives, and AI agents navigating complex stakeholder 
 <div align="center">
 
 ### 📊 Behavioral Intelligence & Relationship Matrix Dashboard
+*Real-time trust scores, reciprocity balance, risk factors, and interaction timelines.*
 ![Strategic CRM Dashboard](dashboard_screenshot.png)
 
 <br/>
 
 ### 🕸️ Interactive Stakeholder Network Graph & Power Structures
+*Vis.js network topology highlighting informal influencers, gatekeepers, and hidden coalitions.*
 ![Stakeholder Network Graph](graph_screenshot.png)
 
 <br/>
 
 ### 🎯 Deep Stakeholder Profile & AI Strategic Advisor Battleplan
+*Psychometric profiling, negotiation behavioral style, and instant high-stakes pre-meeting briefings.*
 ![Stakeholder Profile and AI Strategic Advisor](stakeholder_screenshot.png)
 
 </div>
 
 ---
 
+## 🏗️ System Architecture
+
+```mermaid
+flowchart TD
+    subgraph DataLayer["💾 Persistent State Layer (data/crm_state.json)"]
+        Stakeholders["Stakeholders (Profiles, Goals, Vulnerabilities)"]
+        Relationships["Relationships (Asymmetric Trust & Reciprocity)"]
+        Interactions["Interactions (Meetings, Commitments, Favors)"]
+    end
+
+    subgraph IntelligenceEngine["🧠 Behavioral Intelligence Engines"]
+        Trust["Trust Dynamics Engine
+(Passive Decay, Reciprocity Balance)"]
+        Influence["Influence & Politics Engine
+(NetworkX PageRank, Brokers, Coalitions)"]
+        Negotiation["Negotiation Profiler
+(Style Classification, Promise-Breaker Detection)"]
+        Entropy["Relationship Entropy Engine
+(Shannon Unpredictability & Volatility)"]
+        Risk["Composite Risk Assessment
+(Actionable Drivers & Mitigations)"]
+    end
+
+    DataLayer <--> IntelligenceEngine
+
+    subgraph DualInterface["⚡ Dual-Mode Interface"]
+        subgraph WebApp["🖥️ Web Dashboard (Port 5088)"]
+            Flask["Flask Web Server"]
+            UI["Dark Glassmorphism UI & Vis.js Graph"]
+            AdvisorUI["Live AI Advisor (Gemini / Claude / OpenAI)"]
+        end
+
+        subgraph MCPLayer["🔌 Model Context Protocol (FastMCP)"]
+            MCPServer["mcp_server.py (Stdio JSON-RPC)"]
+            MCPTools["7 Specialized Intelligence Tools"]
+        end
+    end
+
+    IntelligenceEngine <--> DualInterface
+
+    subgraph AIAssistants["🤖 AI Clients & Agents"]
+        Claude["Claude Desktop"]
+        Cursor["Cursor IDE"]
+        Antigravity["Google Antigravity"]
+        Agents["Autonomous Code Agents"]
+    end
+
+    MCPLayer <==> AIAssistants
+```
+
+---
+
 ## 🔌 Model Context Protocol (MCP) Server
 
-Strategic Memory CRM exposes a full **AI Relationship Memory Layer** via MCP. AI assistants in **Claude Desktop**, **Cursor**, **VS Code**, or **Antigravity** can directly query behavioral profiles, calculate negotiation risk, inspect political power structures, and generate pre-meeting tactical briefings.
+Strategic Memory CRM acts as a dedicated **AI Relationship Memory Layer** over MCP. AI assistants in **Claude Desktop**, **Cursor**, **VS Code**, or **Antigravity** can directly query stakeholder psychometrics, inspect organizational politics, and generate tactical negotiation briefings without opening a browser.
 
 ### 🛠️ Exposed MCP Tools
 
-| MCP Tool | Description |
-|---|---|
-| `list_stakeholders` | List all stakeholders with role, organization, tier, personality traits, and risk level. |
-| `get_stakeholder_intel` | Deep-dive profile on an individual (trust ties, negotiation style, reliability, risk drivers, allies/rivals). |
-| `get_organization_politics` | NetworkX-driven structural power map (informal influencers via PageRank, gatekeepers, brokers, coalitions). |
-| `analyze_relationship` | Dyadic relationship analysis (directional trust, favor ledger, entropy, interaction timeline). |
-| `log_interaction` | Record meetings, calls, commitments, and favors with dynamic trust decay and reciprocity updates. |
-| `add_stakeholder` | Create new stakeholders in the strategic memory database. |
-| `generate_tactical_briefing` | Instant pre-meeting psychometric negotiation battleplan and strategic leverage points. |
+| MCP Tool | Parameters | Description |
+|---|---|---|
+| `list_stakeholders` | *None* | Returns all stakeholders with organization, role, hierarchy tier, dominant negotiation style, and risk score. |
+| `get_stakeholder_intel` | `stakeholder_id` *(id or name)* | Comprehensive behavioral intelligence report: trust ties, psychometrics, reliability, risk drivers, allies, and rivals. |
+| `get_organization_politics` | *None* | NetworkX power map: top informal influencers (PageRank), information bridges & gatekeepers (betweenness), and hidden coalitions. |
+| `analyze_relationship` | `source_id`, `target_id` | Deep dyadic analysis: asymmetric trust scores, reciprocity balance, Shannon entropy (volatility), and shared interaction history. |
+| `log_interaction` | `source_id`, `target_id`, `interaction_type`, `summary`, `sentiment`, `commitments_kept`... | Logs a new meeting/call/favor/conflict, recalculates trust decay/growth, updates reciprocity balance, and saves to database. |
+| `add_stakeholder` | `name`, `role`, `organization`, `org_tier`, `personality`, `goals`... | Creates a new stakeholder profile in the strategic memory database with personality traits. |
+| `generate_tactical_briefing` | `stakeholder_id`, `meeting_objective` | Generates an executive pre-meeting negotiation battleplan, power lever analysis, and critical pitfalls. |
 
 ### 🚀 Claude Desktop & Cursor Setup
 
-Add the following to your `claude_desktop_config.json` or Cursor MCP settings:
+Add the following configuration to your `claude_desktop_config.json` or Cursor MCP settings:
 
 ```json
 {
@@ -79,33 +134,51 @@ Add the following to your `claude_desktop_config.json` or Cursor MCP settings:
 }
 ```
 
+### 💡 Example AI Prompts with MCP
+
+Once connected, ask your AI assistant:
+* *"Who are the informal power brokers and gatekeepers in our merger ecosystem?"*
+* *"Analyze the trust volatility and political risk between Marcus Vance and Elena Rostova."*
+* *"I have a high-stakes alignment meeting with David Chen tomorrow. Generate a tactical negotiation briefing with opening moves and concession boundaries."*
+* *"Log a positive negotiation with Sarah Jenkins: she agreed to our Q3 timeline and kept her commitment."*
+
 ---
 
-## 🚀 Key Features
+## 🚀 Core Intelligence Engines
 
-### 1. 🧠 Behavioral Intelligence Engine
-- **Trust Dynamics (`trust.py`):** Asymmetric trust scoring, continuous time-based passive decay, reciprocity balance, and personality compatibility.
-- **Negotiation Profiling (`negotiation.py`):** Dominator, accommodator, collaborator, competitor, avoider styles; detects serial promise-breakers and chronic yielders.
-- **Influence & Organizational Politics (`influence.py`):** NetworkX-powered PageRank, betweenness centrality, hidden coalition detection, gatekeepers, and brokers (articulation points).
-- **Relationship Entropy (`entropy.py`):** Information-theoretic unpredictability measurement via Shannon entropy, trust delta volatility, and interaction regularity.
-- **Composite Risk Assessment (`risk.py`):** Relationship and stakeholder risk scores with actionable factors and tactical recommendations.
+### 1. 🤝 Asymmetric Trust Dynamics (`trust.py`)
+Trust is modeled as an evolving, directional signal ($A ightarrow B 
+eq B ightarrow A$) influenced by:
+* **Passive Temporal Decay:** Unattended relationships decay toward neutral over time ($\lambda = 0.005/	ext{day}$).
+* **Reciprocity Balance:** Tracks one-sided favor economies; chronic imbalances induce trust penalties.
+* **Commitment Reliability:** Kept commitments award $+0.08$ trust; broken commitments penalize $-0.15$; betrayals penalize $-0.25$.
+* **Personality Compatibility:** Psychological affinity nudges trust based on complementary Big-Five traits.
 
-### 2. ⚡ AI Strategic Advisor (Tactical Briefing Generator)
-- Generates high-stakes pre-meeting negotiation battleplans directly on any stakeholder page (`POST /api/advisor/briefing` or via MCP `generate_tactical_briefing`).
-- Supported AI engines:
-  - 🟢 **Built-in Tactical Engine (Offline / Instant):** Deep heuristic rules & psychometric analysis.
-  - ✨ **Google Gemini:** `gemini-2.0-flash`, `gemini-1.5-pro`
-  - 🧠 **OpenAI:** `gpt-4o-mini`, `gpt-4o`, `o3-mini`
-  - ⚡ **Anthropic Claude:** `claude-3-5-sonnet-20241022`
+### 2. ⚔️ Negotiation Behavioral Profiler (`negotiation.py`)
+Classifies stakeholders into behavioral archetypes based on empirical negotiation history:
+* **Dominator:** High frequency of power moves, rarely makes concessions.
+* **Accommodator:** Chronic concession maker, avoids direct confrontation.
+* **Collaborator:** Balanced give-and-take, high commitment reliability ($>85\%$).
+* **Competitor:** Aggressive value claimer with moderate concessions.
+* **Pattern Detection:** Identifies *Serial Promise-Breakers*, *Pure Escalators*, *Chronic Yielders*, and *Rapport Builders*.
 
-### 3. 💾 Data Persistence & Write APIs
-- Real-time JSON persistence (`data/crm_state.json`).
-- `POST /api/interaction` — Log meetings, calls, negotiations, favors, or conflicts with automatic incremental trust updates.
-- `POST /api/stakeholder` — Add new stakeholders dynamically.
-- `POST /api/reset` — Reset dataset to the baseline scenario.
+### 3. 🕸️ Network Centrality & Organizational Politics (`influence.py`)
+Powered by **NetworkX**:
+* **PageRank Power:** Identifies informal influencers whose opinions cascade through the network.
+* **Betweenness Centrality & Articulation Points:** Identifies structural bottlenecks (gatekeepers) and critical communication bridges (brokers).
+* **Community Detection:** Uncovers hidden coalitions and informal faction clusters.
 
-### 4. 🔌 Dynamic Port Conflict Management
-- Starts on port `5088` by default with automatic port fallback (`5089`, `5090`...) if the port is in use.
+### 4. 📈 Shannon Relationship Entropy (`entropy.py`)
+Quantifies relationship volatility and unpredictability using information theory:
+$$H(X) = -\sum p(x) \log_2 p(x)$$
+Combined with trust delta variance and interaction regularity to flag erratic, high-entropy stakeholder ties.
+
+### 5. 🎯 AI Strategic Advisor (`app.py` & `mcp_tools.py`)
+Generates structured pre-meeting battleplans with 4 distinct analytical sections:
+1. **Psychological Diagnosis:** Core drivers, hidden agendas, and mindset.
+2. **Strategic Leverage & Vulnerabilities:** Identified soft spots and leverage anchors.
+3. **Tactical Playbook:** Opening framing, concession strategy, and closing techniques.
+4. **Critical Pitfalls:** Psychological landmines to avoid.
 
 ---
 
@@ -124,48 +197,50 @@ python app.py
 ```
 Open [http://localhost:5088](http://localhost:5088) in your browser.
 
-### 3. Run the MCP Server (Stdio)
+### 3. Run the MCP Server
 ```bash
 python mcp_server.py
 ```
 
-### 4. Run Automated Tests
+### 4. Run Automated Test Suite
 ```bash
 python -m unittest discover tests
 ```
 
 ---
 
-## 📂 Architecture
+## 📂 Project Structure
 
 ```
 strategic-memory-crm/
-├── app.py                          # Flask web dashboard & REST APIs
+├── app.py                          # Flask web dashboard & REST API server
 ├── mcp_server.py                   # Model Context Protocol (MCP) server entry point
+├── pyproject.toml                  # Standard Python package metadata & scripts
+├── requirements.txt                # Production dependencies (Flask, NetworkX, NumPy, SciPy, MCP)
 ├── strategic_memory_crm/
 │   ├── models.py                   # Core dataclasses (Stakeholder, Interaction, Relationship, CRMState)
-│   ├── storage.py                  # JSON persistence load & save engine
-│   ├── trust.py                    # Trust dynamics & passive decay engine
-│   ├── negotiation.py              # Behavioral profiling & pattern detection
-│   ├── influence.py                # Graph centrality, gatekeepers, brokers & coalitions
-│   ├── entropy.py                  # Shannon entropy & relationship volatility
-│   ├── risk.py                     # Composite risk assessment & recommendations
+│   ├── storage.py                  # Real-time JSON persistence load & save engine
+│   ├── trust.py                    # Asymmetric trust dynamics & passive decay engine
+│   ├── negotiation.py              # Behavioral negotiation profiling & pattern detection
+│   ├── influence.py                # Graph centrality, gatekeepers, brokers & coalitions (NetworkX)
+│   ├── entropy.py                  # Shannon entropy & relationship volatility scoring
+│   ├── risk.py                     # Composite risk assessment & actionable mitigations
 │   ├── mcp_tools.py                # Modular MCP behavioral intelligence tools
 │   ├── graph.py                    # Vis.js JSON graph serialization
 │   ├── simulation.py               # Interaction history simulator
-│   └── dataset.py                  # Fictional M&A dataset generator
+│   └── dataset.py                  # Fictional corporate M&A dataset generator
 ├── templates/                      # Jinja2 HTML templates
 │   ├── base.html                   # Dark-themed master layout
-│   ├── dashboard.html              # Matrix, stats & interaction/stakeholder modals
+│   ├── dashboard.html              # Relationship matrix, statistics & action modals
 │   ├── stakeholder.html            # Profile, timeline & AI Strategic Advisor
 │   └── graph.html                  # Interactive Vis.js network graph
 ├── static/
 │   └── style.css                   # Responsive dark UI styling
 ├── tests/
-│   ├── test_crm.py                 # Core CRM unit test suite
-│   └── test_mcp.py                 # MCP server and tools unit test suite
-├── data/                           # Persistent state directory (crm_state.json)
-└── requirements.txt                # Dependencies (Flask, NetworkX, NumPy, SciPy, MCP)
+│   ├── test_crm.py                 # Core CRM behavioral engine unit test suite
+│   └── test_mcp.py                 # MCP server & tools unit test suite (25 tests total)
+└── data/
+    └── crm_state.json              # Persistent database state
 ```
 
 ---

@@ -32,19 +32,74 @@ Kimin kime güvendiğinin kimin ne satın aldığından daha önemli olduğu kar
 <div align="center">
 
 ### 📊 Davranışsal Zeka & İlişki Matrisi Kontrol Paneli
+*Gerçek zamanlı güven puanları, karşılıklılık dengesi, risk faktörleri ve etkileşim zaman çizelgesi.*
 ![Strategic CRM Dashboard](dashboard_screenshot.png)
 
 <br/>
 
 ### 🕸️ Etkileşimli Paydaş Ağ Grafiği & Güç Yapıları
+*Gayriresmi liderleri, bilgi bekçilerini ve gizli koalisyonları öne çıkaran Vis.js ağ topolojisi.*
 ![Stakeholder Network Graph](graph_screenshot.png)
 
 <br/>
 
 ### 🎯 Detaylı Paydaş Profili & Yapay Zeka Taktiksel Savaş Planı
+*Psikometrik profilleme, müzakere davranış stili ve anlık toplantı öncesi taktiksel brifingler.*
 ![Stakeholder Profile and AI Strategic Advisor](stakeholder_screenshot.png)
 
 </div>
+
+---
+
+## 🏗️ Sistem Mimarisi
+
+```mermaid
+flowchart TD
+    subgraph DataLayer["💾 Kalıcı Veri Katmanı (data/crm_state.json)"]
+        Stakeholders["Paydaşlar (Profiller, Hedefler, Zayıf Noktalar)"]
+        Relationships["İlişkiler (Asimetrik Güven & Karşılıklılık Dengesi)"]
+        Interactions["Etkileşimler (Toplantılar, Taahhütler, İyilikler)"]
+    end
+
+    subgraph IntelligenceEngine["🧠 Davranışsal Zeka Motorları"]
+        Trust["Güven Dinamikleri Motoru
+(Zamana Bağlı Sönümleme, Karşılıklılık)"]
+        Influence["Etki & Örgüt Politikası
+(NetworkX PageRank, Aracılar, Koalisyonlar)"]
+        Negotiation["Müzakere Profilleme
+(Stil Sınıflandırma, Sözünden Dönenlerin Tespiti)"]
+        Entropy["İlişki Entropisi Motoru
+(Shannon Belirsizlik & Volatilite)"]
+        Risk["Birleşik Risk Analizi
+(Eyleme Geçirilebilir Risk Sürücüleri)"]
+    end
+
+    DataLayer <--> IntelligenceEngine
+
+    subgraph DualInterface["⚡ Çift Modlu Arayüz"]
+        subgraph WebApp["🖥️ Web Kontrol Paneli (Port 5088)"]
+            Flask["Flask Web Sunucusu"]
+            UI["Koyu Cam Tasarım (Glassmorphism) & Vis.js Grafiği"]
+            AdvisorUI["Canlı AI Danışmanı (Gemini / Claude / OpenAI)"]
+        end
+
+        subgraph MCPLayer["🔌 Model Context Protocol (FastMCP)"]
+            MCPServer["mcp_server.py (Stdio JSON-RPC)"]
+            MCPTools["7 Özel Davranışsal İstihbarat Aracı"]
+        end
+    end
+
+    IntelligenceEngine <--> DualInterface
+
+    subgraph AIAssistants["🤖 AI İstemcileri & Ajanlar"]
+        Claude["Claude Desktop"]
+        Cursor["Cursor IDE"]
+        Antigravity["Google Antigravity"]
+        Agents["Otonom Kod Ajanları"]
+    end
+
+    MCPLayer <==> AIAssistants
+```
 
 ---
 
@@ -54,15 +109,15 @@ Strategic Memory CRM, yapay zekâ asistanları için **Stratejik İlişki Hafız
 
 ### 🛠️ Erişilebilir MCP Araçları
 
-| MCP Aracı | Açıklama |
-|---|---|
-| `list_stakeholders` | Tüm paydaşları unvan, şirket, hiyerarşi, kişilik özellikleri ve risk puanıyla listeler. |
-| `get_stakeholder_intel` | Bir paydaş hakkında derin istihbarat sunar (güven bağları, müzakere stili, güvenilirlik, risk faktörleri, müttefik/rakipler). |
-| `get_organization_politics` | NetworkX destekli yapısal güç haritasını çıkarır (PageRank ile gayriresmi liderler, bilgi bekçileri, aracılar, koalisyonlar). |
-| `analyze_relationship` | İki kişi arasındaki ikili ilişkiyi analiz eder (yönlü güven, iyilik dengesi, entropi/volatilite, etkileşim geçmişi). |
-| `log_interaction` | Yeni görüşme, arama veya taahhütleri dinamik güven sönümlemesi ve karşılıklılık güncellemeleriyle kaydeder. |
-| `add_stakeholder` | Stratejik hafıza veritabanına yeni bir paydaş ekler. |
-| `generate_tactical_briefing` | Toplantı öncesi anlık psikometrik müzakere savaş planı ve taktiksel kaldıraç noktaları üretir. |
+| MCP Aracı | Parametreler | Açıklama |
+|---|---|---|
+| `list_stakeholders` | *Yok* | Tüm paydaşları unvan, şirket, hiyerarşi, kişilik özellikleri ve risk puanıyla listeler. |
+| `get_stakeholder_intel` | `stakeholder_id` *(id veya isim)* | Bir paydaş hakkında derin istihbarat sunar (güven bağları, müzakere stili, güvenilirlik, risk faktörleri, müttefik/rakipler). |
+| `get_organization_politics` | *Yok* | NetworkX destekli yapısal güç haritasını çıkarır (PageRank ile gayriresmi liderler, bilgi bekçileri, aracılar, koalisyonlar). |
+| `analyze_relationship` | `source_id`, `target_id` | İki kişi arasındaki ikili ilişkiyi analiz eder (yönlü güven, iyilik dengesi, entropi/volatilite, etkileşim geçmişi). |
+| `log_interaction` | `source_id`, `target_id`, `interaction_type`, `summary`, `sentiment`... | Yeni görüşme, arama veya taahhütleri dinamik güven sönümlemesi ve karşılıklılık güncellemeleriyle kaydeder. |
+| `add_stakeholder` | `name`, `role`, `organization`, `org_tier`, `personality`... | Stratejik hafıza veritabanına kişilik özellikleriyle birlikte yeni bir paydaş ekler. |
+| `generate_tactical_briefing` | `stakeholder_id`, `meeting_objective` | Toplantı öncesi anlık psikometrik müzakere savaş planı ve taktiksel kaldıraç noktaları üretir. |
 
 ### 🚀 Claude Desktop & Cursor Kurulumu
 
@@ -79,33 +134,51 @@ Strategic Memory CRM, yapay zekâ asistanları için **Stratejik İlişki Hafız
 }
 ```
 
+### 💡 MCP ile Örnek AI Komutları
+
+Bağlantı kurulduktan sonra yapay zekâ asistanınıza şunları sorabilirsiniz:
+* *"Şirket birleşmesi sürecindeki gayriresmi güç odakları ve bilgi bekçileri kimler?"*
+* *"Marcus Vance ile Elena Rostova arasındaki ilişki riskini ve güven oynaklığını analiz et."*
+* *"Yarın David Chen ile kritik bir toplantım var. Açılış hamleleri ve taviz sınırları içeren taktiksel bir müzakere planı hazırla."*
+* *"Sarah Jenkins ile olumlu bir görüşme kaydet: Q3 takvimimize onay verdi ve taahhüdünü yerine getirdi."*
+
 ---
 
-## 🚀 Öne Çıkan Özellikler
+## 🚀 Çekirdek Zeka Motorları
 
-### 1. 🧠 Davranışsal Zeka Motoru
-- **Güven Dinamikleri (`trust.py`):** Asimetrik güven puanlama, zamana bağlı sönümleme (passive decay), karşılıklılık dengesi ve kişilik uyumu.
-- **Müzakere Profili (`negotiation.py`):** Dominant, işbirlikçi, taviz veren ve kaçınmacı stiller; sözünden dönenler (promise-breakers) ve kronik tavizcilerin tespiti.
-- **Etki ve Örgütsel Politika (`influence.py`):** NetworkX destekli PageRank, betweenness centrality, gizli koalisyonlar, bilgi bekçileri (gatekeepers) ve kilit aracılar (brokers).
-- **İlişki Entropisi (`entropy.py`):** Shannon entropisi, güven dalgalanması (volatilite) ve etkileşim düzenliliği ile öngörülemezlik ölçümü.
-- **Birleşik Risk Analizi (`risk.py`):** Eyleme geçirilebilir faktörler ve taktiksel öneriler içeren paydaş risk puanları.
+### 1. 🤝 Asimetrik Güven Dinamikleri (`trust.py`)
+Güven, zamana bağlı ve yönlü bir sinyal ($A ightarrow B 
+eq B ightarrow A$) olarak modellenir:
+* **Zamansal Sönümleme (Passive Decay):** İletişim kurulmayan ilişkiler zamanla nötre doğru geriler ($\lambda = 0.005/	ext{gün}$).
+* **Karşılıklılık Dengesi (Reciprocity):** Tek taraflı iyilikleri takip eder; kronik dengesizlikler güven cezasına yol açar.
+* **Taahhüt Güvenilirliği:** Tutulan sözler $+0.08$ güven kazandırır; tutulmayan sözler $-0.15$, ihanetler $-0.25$ ceza alır.
+* **Kişilik Uyumu:** Big-Five kişilik özellikleri arasındaki uyum güvene pozitif ivme katar.
 
-### 2. ⚡ Canlı Yapay Zeka Stratejik Danışmanı (Tactical Briefing)
-- Herhangi bir paydaşın sayfasında veya MCP üzerinden (`generate_tactical_briefing`) toplantı öncesi taktiksel müzakere savaş planı üretir.
-- Desteklenen yapay zekâ motorları:
-  - 🟢 **Dahili Taktiksel Motor (Çevrimdışı / Anında):** Kapsamlı sezgisel kurallar ve psikometrik analiz.
-  - ✨ **Google Gemini:** `gemini-2.0-flash`, `gemini-1.5-pro`
-  - 🧠 **OpenAI:** `gpt-4o-mini`, `gpt-4o`, `o3-mini`
-  - ⚡ **Anthropic Claude:** `claude-3-5-sonnet-20241022`
+### 2. ⚔️ Müzakere Davranış Profilleme (`negotiation.py`)
+Paydaşları geçmiş müzakere davranışlarına göre arketipik olarak sınıflandırır:
+* **Dominant (Dominator):** Güç gösterisi yüksek, nadiren taviz verir.
+* **Uyumlu (Accommodator):** Kronik taviz veren, çatışmadan kaçınan.
+* **İşbirlikçi (Collaborator):** Dengeli al-ver dengesi, yüksek güvenilirlik ($>\%85$).
+* **Yarışmacı (Competitor):** Agresif avantaj arayan, sınırlı taviz veren.
+* **Kalıp Tespiti:** *Sözünden Dönenler*, *Kronik Tavizciler*, *Tırmandırıcılar* ve *Köprü Kuranlar*.
 
-### 3. 💾 Kalıcı Veri & Yazma API'leri
-- Gerçek zamanlı JSON kalıcılığı (`data/crm_state.json`).
-- `POST /api/interaction` — Toplantı, telefon, müzakere, iyilik veya çatışmaları güven güncellemeleriyle kaydeder.
-- `POST /api/stakeholder` — Yeni paydaşları dinamik olarak ekler.
-- `POST /api/reset` — Veri setini başlangıç senaryosuna sıfırlar.
+### 3. 🕸️ Ağ Merkeziliği & Örgütsel Politika (`influence.py`)
+**NetworkX** kütüphanesinden güç alır:
+* **PageRank Etki Gücü:** Ağ içerisinde fikirleri dalga dalga yayılan gayriresmi liderleri bulur.
+* **Aracılık Merkeziliği (Betweenness) & Köprü Düğümler:** İletişim darboğazlarını (gatekeepers) ve kritik aracıları (brokers) tespit eder.
+* **Topluluk Tespiti:** Ağdaki gizli çıkar gruplarını ve koalisyonları ortaya çıkarır.
 
-### 4. 🔌 Dinamik Port Yönetimi
-- Varsayılan olarak `5088` portunda başlar; port kullanımda ise otomatik olarak bir sonraki boş porta (`5089`, `5090`...) geçer.
+### 4. 📈 Shannon İlişki Entropisi (`entropy.py`)
+İlişkilerin oynaklığını ve öngörülemezliğini bilgi teorisiyle ölçer:
+$$H(X) = -\sum p(x) \log_2 p(x)$$
+Güven dalgalanması (volatilite) ve etkileşim periyodu ile birleştirilerek riskli ilişkileri önceden tespit eder.
+
+### 5. 🎯 Canlı Yapay Zeka Strateji Danışmanı (`app.py` & `mcp_tools.py`)
+Toplantı öncesinde 4 ana başlıktan oluşan taktiksel savaş planı üretir:
+1. **Psikolojik Teşhis:** Temel motivasyonlar, gizli ajandalar ve zihniyet.
+2. **Stratejik Kaldıraç & Zayıf Noktalar:** Hassas noktalar ve güç dayanakları.
+3. **Taktik Oyun Planı:** Açılış çerçevesi, taviz taktiği ve kapanış stratejisi.
+4. **Kritik Hatalar:** Asla yapılmaması gereken davranışlar.
 
 ---
 
@@ -124,7 +197,7 @@ python app.py
 ```
 Tarayıcınızda [http://localhost:5088](http://localhost:5088) adresini açın.
 
-### 3. MCP Sunucusunu Başlatın (Stdio)
+### 3. MCP Sunucusunu Başlatın
 ```bash
 python mcp_server.py
 ```
@@ -136,36 +209,38 @@ python -m unittest discover tests
 
 ---
 
-## 📂 Mimari
+## 📂 Proje Mimarisi
 
 ```
 strategic-memory-crm/
-├── app.py                          # Flask web kontrol paneli & REST API'leri
+├── app.py                          # Flask web kontrol paneli & REST API sunucusu
 ├── mcp_server.py                   # Model Context Protocol (MCP) sunucu giriş noktası
+├── pyproject.toml                  # Standart Python paket metaverileri ve betikleri
+├── requirements.txt                # Bağımlılıklar (Flask, NetworkX, NumPy, SciPy, MCP)
 ├── strategic_memory_crm/
 │   ├── models.py                   # Veri sınıfları (Stakeholder, Interaction, Relationship, CRMState)
-│   ├── storage.py                  # JSON yükleme & kaydetme motoru
-│   ├── trust.py                    # Güven dinamikleri & zamansal sönümleme motoru
-│   ├── negotiation.py              # Davranışsal profilleme & kalıp tespiti
-│   ├── influence.py                # Çizge merkeziliği, bilgi bekçileri, aracılar & koalisyonlar
-│   ├── entropy.py                  # Shannon entropisi & ilişki dalgalanması
-│   ├── risk.py                     # Birleşik risk analizi & öneriler
+│   ├── storage.py                  # Gerçek zamanlı JSON yükleme & kaydetme motoru
+│   ├── trust.py                    # Asimetrik güven dinamikleri & zamansal sönümleme motoru
+│   ├── negotiation.py              # Davranışsal müzakere profilleme & kalıp tespiti
+│   ├── influence.py                # Çizge merkeziliği, bilgi bekçileri, aracılar & koalisyonlar (NetworkX)
+│   ├── entropy.py                  # Shannon entropisi & ilişki oynaklığı puanlama
+│   ├── risk.py                     # Birleşik risk analizi & hafifletme önerileri
 │   ├── mcp_tools.py                # Modüler MCP davranışsal zeka araçları
 │   ├── graph.py                    # Vis.js JSON çizge serileştirme
 │   ├── simulation.py               # Etkileşim geçmişi simülatörü
 │   └── dataset.py                  # Örnek şirket birleşmesi (M&A) veri seti üreticisi
 ├── templates/                      # Jinja2 HTML şablonları
 │   ├── base.html                   # Koyu temalı ana düzen
-│   ├── dashboard.html              # Matris, istatistikler & etkileşim/paydaş modalları
+│   ├── dashboard.html              # İlişki matrisi, istatistikler & aksiyon modalları
 │   ├── stakeholder.html            # Paydaş profili, zaman çizelgesi & AI Danışmanı
 │   └── graph.html                  # Etkileşimli Vis.js ağ grafiği
 ├── static/
 │   └── style.css                   # Duyarlı koyu UI tasarımı
 ├── tests/
-│   ├── test_crm.py                 # Temel CRM birim test paketi
-│   └── test_mcp.py                 # MCP sunucu ve araçları test paketi
-├── data/                           # Kalıcı durum dizini (crm_state.json)
-└── requirements.txt                # Bağımlılıklar (Flask, NetworkX, NumPy, SciPy, MCP)
+│   ├── test_crm.py                 # Temel CRM davranış motoru test paketi
+│   └── test_mcp.py                 # MCP sunucu ve araçları test paketi (toplam 25 test)
+└── data/
+    └── crm_state.json              # Kalıcı veritabanı durumu
 ```
 
 ---
