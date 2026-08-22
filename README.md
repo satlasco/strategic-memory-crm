@@ -3,6 +3,7 @@
 <div align="center">
 
 [![MCP](https://img.shields.io/badge/MCP-Model_Context_Protocol-6366f1?style=for-the-badge&logo=anthropic&logoColor=white)](https://modelcontextprotocol.io/)
+[![PyPI](https://img.shields.io/pypi/v/strategic-memory-crm?style=for-the-badge&color=3775A9&logo=pypi&logoColor=white)](https://pypi.org/project/strategic-memory-crm/)
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![Flask](https://img.shields.io/badge/Flask-3.0+-000000?style=for-the-badge&logo=flask&logoColor=white)](https://palletsprojects.com/p/flask/)
 [![NetworkX](https://img.shields.io/badge/NetworkX-3.2+-blue?style=for-the-badge&logo=python)](https://networkx.org/)
@@ -147,8 +148,10 @@ Once connected, ask your AI assistant:
 ## 🚀 Core Intelligence Engines
 
 ### 1. 🤝 Asymmetric Trust Dynamics (`trust.py`)
-Trust is modeled as an evolving, directional signal ($A ightarrow B 
-eq B ightarrow A$) influenced by:
+Trust is modeled as an evolving, directional signal ($A 
+ightarrow B 
+eq B 
+ightarrow A$) influenced by:
 * **Passive Temporal Decay:** Unattended relationships decay toward neutral over time ($\lambda = 0.005/	ext{day}$).
 * **Reciprocity Balance:** Tracks one-sided favor economies; chronic imbalances induce trust penalties.
 * **Commitment Reliability:** Kept commitments award $+0.08$ trust; broken commitments penalize $-0.15$; betrayals penalize $-0.25$.

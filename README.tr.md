@@ -3,6 +3,7 @@
 <div align="center">
 
 [![MCP](https://img.shields.io/badge/MCP-Model_Context_Protocol-6366f1?style=for-the-badge&logo=anthropic&logoColor=white)](https://modelcontextprotocol.io/)
+[![PyPI](https://img.shields.io/pypi/v/strategic-memory-crm?style=for-the-badge&color=3775A9&logo=pypi&logoColor=white)](https://pypi.org/project/strategic-memory-crm/)
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![Flask](https://img.shields.io/badge/Flask-3.0+-000000?style=for-the-badge&logo=flask&logoColor=white)](https://palletsprojects.com/p/flask/)
 [![NetworkX](https://img.shields.io/badge/NetworkX-3.2+-blue?style=for-the-badge&logo=python)](https://networkx.org/)
@@ -147,8 +148,10 @@ Bağlantı kurulduktan sonra yapay zekâ asistanınıza şunları sorabilirsiniz
 ## 🚀 Çekirdek Zeka Motorları
 
 ### 1. 🤝 Asimetrik Güven Dinamikleri (`trust.py`)
-Güven, zamana bağlı ve yönlü bir sinyal ($A ightarrow B 
-eq B ightarrow A$) olarak modellenir:
+Güven, zamana bağlı ve yönlü bir sinyal ($A 
+ightarrow B 
+eq B 
+ightarrow A$) olarak modellenir:
 * **Zamansal Sönümleme (Passive Decay):** İletişim kurulmayan ilişkiler zamanla nötre doğru geriler ($\lambda = 0.005/	ext{gün}$).
 * **Karşılıklılık Dengesi (Reciprocity):** Tek taraflı iyilikleri takip eder; kronik dengesizlikler güven cezasına yol açar.
 * **Taahhüt Güvenilirliği:** Tutulan sözler $+0.08$ güven kazandırır; tutulmayan sözler $-0.15$, ihanetler $-0.25$ ceza alır.
